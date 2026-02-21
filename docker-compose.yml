@@ -1,0 +1,59 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: venera-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-venera}
+      POSTGRES_USER: ${POSTGRES_USER:-venera}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-venera}
+    ports:
+      - "${POSTGRES_HOST_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-venera} -d ${POSTGRES_DB:-venera}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./java-backend
+      dockerfile: Dockerfile
+    container_name: venera-backend
+    environment:
+      SERVER_PORT: 8080
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-venera}
+      DB_USER: ${POSTGRES_USER:-venera}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-venera}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      OAUTH2_REDIRECT_URL: ${OAUTH2_REDIRECT_URL:-http://localhost:5173/auth/callback}
+      OAUTH2_GOOGLE_REDIRECT_URI: ${OAUTH2_GOOGLE_REDIRECT_URI:-http://localhost:8080/login/oauth2/code/google}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${BACKEND_HOST_PORT:-8080}:8080"
+    restart: unless-stopped
+    profiles: ["app"]
+
+  frontend:
+    build:
+      context: ./svelte-frontend
+      dockerfile: Dockerfile
+    container_name: venera-frontend
+    environment:
+      ORIGIN: http://localhost:${FRONTEND_HOST_PORT:-5173}
+      PUBLIC_API_BASE_URL: http://localhost:${BACKEND_HOST_PORT:-8080}
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "${FRONTEND_HOST_PORT:-5173}:5173"
+    restart: unless-stopped
+    profiles: ["app"]
+
+volumes:
+  postgres_data:
