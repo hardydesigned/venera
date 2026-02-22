@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import jakarta.validation.Valid;
@@ -18,6 +19,7 @@ import com.hardytec.venera.auth.adapters.web.CurrentUserResolver;
 import com.hardytec.venera.task.application.TaskService;
 import com.hardytec.venera.task.adapters.web.task.dto.TaskDTO;
 import com.hardytec.venera.task.adapters.web.task.dto.CreateTaskDTO;
+import com.hardytec.venera.task.adapters.web.task.dto.UpdateTaskDTO;
 
 @RestController
 @RequestMapping("/tasks")
@@ -55,6 +57,12 @@ public class TaskController {
     public ResponseEntity<TaskDTO> getTask(@PathVariable UUID id) {
         UUID userId = currentUserResolver.getCurrentUserId();
         return ResponseEntity.ok(taskService.getTask(id, userId));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TaskDTO> updateTask(@PathVariable UUID id, @Valid @RequestBody UpdateTaskDTO updateTaskDTO) {
+        UUID userId = currentUserResolver.getCurrentUserId();
+        return ResponseEntity.ok(taskService.updateTask(id, updateTaskDTO, userId));
     }
 
     @DeleteMapping("/{id}")

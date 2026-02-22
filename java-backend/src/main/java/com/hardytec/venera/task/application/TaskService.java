@@ -3,6 +3,7 @@ package com.hardytec.venera.task.application;
 import org.springframework.stereotype.Service;
 
 import com.hardytec.venera.task.adapters.web.task.dto.CreateTaskDTO;
+import com.hardytec.venera.task.adapters.web.task.dto.UpdateTaskDTO;
 import com.hardytec.venera.task.adapters.persistence.task.TaskSpringDataRepository;
 import com.hardytec.venera.task.domain.TaskItem;
 import com.hardytec.venera.task.adapters.web.task.dto.TaskDTO;
@@ -52,6 +53,21 @@ public class TaskService {
             throw new TaskNotFoundException(id);
         }
         return TaskDTO.from(task);
+    }
+
+    public TaskDTO updateTask(UUID id, UpdateTaskDTO dto, UUID userId) {
+        TaskItem task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
+        if (!task.getUserId().equals(userId)) {
+            throw new TaskNotFoundException(id);
+        }
+        task.setTitle(dto.getTitle());
+        task.setDescription(dto.getDescription());
+        task.setStartDate(dto.getStartDate());
+        task.setDueDate(dto.getDueDate());
+        task.setCategory(dto.getCategory());
+        task.setStatus(dto.getStatus());
+        TaskItem saved = taskRepository.save(task);
+        return TaskDTO.from(saved);
     }
 
     public void deleteTask(UUID id, UUID userId) {

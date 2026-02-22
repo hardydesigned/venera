@@ -6,7 +6,14 @@
 	import { Badge, Button } from 'flowbite-svelte';
 	import { authStore, clearAuth, setAuthInitialized, setAuthUser } from '$lib/auth/auth-store';
 	import { fetchCurrentUser, logout as logoutRequest } from '$lib/api/auth';
+	import { initThemeSync } from '$lib/theme/theme-store';
+	import ThemeToggle from '$lib/components/theme-toggle.svelte';
 	import './layout.css';
+	import AppSidebar from '$lib/components/app-sidebar.svelte';
+	import CreateTaskDialog from '$lib/features/tasks/create-task-dialog.svelte';
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
+	import { Separator } from '$lib/components/ui/separator/index.js';
+	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 
 	const queryClient = new QueryClient();
 	let { children } = $props();
@@ -17,6 +24,7 @@
 
 	onMount(async () => {
 		if (typeof window === 'undefined') return;
+		initThemeSync();
 		if ($authStore.initialized) return;
 		if (isPublicPath) {
 			setAuthInitialized();
@@ -41,12 +49,6 @@
 		}
 	});
 
-	const navItems = [
-		{ href: '/inbox', label: 'Eingang' },
-		{ href: '/projects', label: 'Projekte' },
-		{ href: '/calendar', label: 'Kalender' }
-	];
-
 	async function logout() {
 		try {
 			await logoutRequest();
@@ -59,32 +61,5 @@
 </script>
 
 <QueryClientProvider client={queryClient}>
-	<div class="min-h-screen bg-slate-50 text-slate-900">
-		{#if !isPublicPath}
-			<header class="border-b border-slate-200 bg-white">
-				<div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-					<div class="flex items-center gap-3">
-						<h1 class="text-lg font-semibold">Venera</h1>
-						<Badge color="blue">MVP</Badge>
-					</div>
-					<nav class="flex items-center gap-2">
-						{#each navItems as item}
-							<Button
-								href={item.href}
-								color={page.url.pathname.startsWith(item.href) ? 'dark' : 'light'}
-								size="sm"
-							>
-								{item.label}
-							</Button>
-						{/each}
-						<Button color="light" size="sm" onclick={logout}>Abmelden</Button>
-					</nav>
-				</div>
-			</header>
-		{/if}
-
-		<main class="mx-auto w-full max-w-6xl px-4 py-6">
-			{@render children()}
-		</main>
-	</div>
+	{@render children()}
 </QueryClientProvider>

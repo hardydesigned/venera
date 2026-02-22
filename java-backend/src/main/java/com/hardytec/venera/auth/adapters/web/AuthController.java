@@ -54,8 +54,11 @@ public class AuthController {
     }
 
     @GetMapping("/csrf")
-    public Map<String, String> csrf(CsrfToken csrfToken) {
-        return Map.of("token", csrfToken.getToken());
+    public Map<String, String> csrf(HttpServletRequest request, CsrfToken csrfToken) {
+        // Spring Security 6: Token muss explizit abgerufen werden, damit das Cookie gesetzt wird
+        // Das Aufrufen von getToken() "materialisiert" das Token
+        String token = csrfToken.getToken();
+        return Map.of("token", token);
     }
 
     @GetMapping("/me")

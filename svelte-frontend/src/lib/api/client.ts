@@ -7,10 +7,11 @@ export function getApiBase(): string {
 	return API_BASE;
 }
 
-export async function apiFetch(
-	path: string,
-	options: RequestInit = {}
-): Promise<Response> {
+export async function
+	apiFetch(
+		path: string,
+		options: RequestInit = {}
+	): Promise<Response> {
 	const url = `${API_BASE}${path}`;
 	const method = (options.method ?? 'GET').toUpperCase();
 

@@ -19,3 +19,12 @@ export interface CreateTaskInput {
 	category: TaskPriorityCategory;
 	status: TaskStatus;
 }
+
+export interface UpdateTaskInput {
+	title: string;
+	description: string;
+	startDate: string;
+	dueDate: string;
+	category: TaskPriorityCategory;
+	status: TaskStatus;
+}

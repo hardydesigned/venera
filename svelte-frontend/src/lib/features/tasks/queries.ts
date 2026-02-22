@@ -1,6 +1,6 @@
 import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
-import { fetchInboxTasks, createTask, deleteTask } from '$lib/api/tasks';
-import type { CreateTaskInput } from './types';
+import { fetchInboxTasks, createTask, updateTask, deleteTask } from '$lib/api/tasks';
+import type { CreateTaskInput, UpdateTaskInput } from './types';
 
 export const inboxTasksQuery = () =>
 	createQuery({
@@ -12,6 +12,16 @@ export const createTaskMutation = () => {
 	const queryClient = useQueryClient();
 	return createMutation({
 		mutationFn: (input: CreateTaskInput) => createTask(input),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['tasks', 'inbox'] });
+		}
+	}, queryClient);
+};
+
+export const updateTaskMutation = () => {
+	const queryClient = useQueryClient();
+	return createMutation({
+		mutationFn: ({ id, input }: { id: string; input: UpdateTaskInput }) => updateTask(id, input),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['tasks', 'inbox'] });
 		}
