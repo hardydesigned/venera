@@ -8,10 +8,22 @@
 	import ThemeToggle from './theme-toggle.svelte';
 	import type { ComponentProps } from 'svelte';
 	import type { AuthUser } from '$lib/auth/auth-store';
-	import { logout } from '$lib/api/auth';
+	import { clearAuth } from '$lib/auth/auth-store';
+	import { logout as logoutRequest } from '$lib/api/auth';
+	import { goto } from '$app/navigation';
 
 	let { user }: { user: AuthUser | null } = $props();
 	const sidebar = useSidebar();
+
+	async function handleLogout() {
+		try {
+			await logoutRequest();
+		} catch {
+			// ignore and clear client state anyway
+		}
+		clearAuth();
+		goto('/login', { replaceState: true });
+	}
 </script>
 
 {#if user}
@@ -68,7 +80,7 @@
 						</DropdownMenu.Item>
 					</DropdownMenu.Group>
 					<DropdownMenu.Separator />
-					<DropdownMenu.Item onclick={logout} class="cursor-pointer">
+					<DropdownMenu.Item onclick={handleLogout} class="cursor-pointer">
 						<LogOut />
 						Abmelden
 					</DropdownMenu.Item>

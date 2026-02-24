@@ -2,7 +2,7 @@ package com.hardytec.venera.task.adapters.web.task.dto;
 
 import com.hardytec.venera.task.domain.TaskItem;
 import java.util.UUID;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import com.hardytec.venera.task.domain.TaskPriorityCategory;
 import com.hardytec.venera.task.domain.TaskStatus;
 
@@ -15,8 +15,8 @@ public class TaskDTO {
     private UUID id;
     private String title;
     private String description;
-    private LocalDate startDate;
-    private LocalDate dueDate;
+    private LocalDateTime startDate;
+    private LocalDateTime dueDate;
     private TaskPriorityCategory category;
     private TaskStatus status;
 

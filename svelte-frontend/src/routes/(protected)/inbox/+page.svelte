@@ -1,30 +1,70 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { inboxTasksQuery } from '$lib/features/tasks/queries';
-	import type { TaskPriorityCategory, TaskStatus, Task } from '$lib/features/tasks/types';
+	import {
+		inboxTasksQuery,
+		createTaskMutation,
+		deleteTaskMutation,
+		updateTaskMutation
+	} from '$lib/features/tasks/queries';
+	import type {
+		TaskPriorityCategory,
+		Task,
+		CreateTaskInput,
+		TaskStatus
+	} from '$lib/features/tasks/types';
 	import { createTaskDialogStore } from '$lib/features/tasks/create-task-dialog-store';
-	import DeleteTaskDialog from '$lib/features/tasks/delete-task-dialog.svelte';
-	import { TrashIcon, PlusIcon } from '@lucide/svelte';
-	import { authStore } from '$lib/auth/auth-store';
+	import { TrashIcon, PlusIcon, Circle, CircleCheckBig } from '@lucide/svelte';
+	import { toastStore } from '$lib/stores/toast-store';
+	import { get } from 'svelte/store';
 
 	const tasks = inboxTasksQuery();
+	const createMutation = createTaskMutation();
+	const deleteMutation = deleteTaskMutation();
+	const updateMutation = updateTaskMutation();
 	const tasksList = $derived($tasks.data ?? []);
-
-	let deleteDialogOpen = $state(false);
-	let taskToDelete = $state<Task | null>(null);
-
-	const statusLabels: Record<TaskStatus, string> = {
-		OPEN: 'Offen',
-		IN_PROGRESS: 'In Arbeit',
-		DONE: 'Erledigt',
-		CANCELLED: 'Abgebrochen'
-	};
 
 	const categoryLabels: Record<TaskPriorityCategory, string> = {
 		A: 'A',
 		B: 'B',
 		C: 'C'
 	};
+
+	function handleDelete(task: Task) {
+		const taskToRestore: CreateTaskInput = {
+			title: task.title,
+			description: task.description ?? '',
+			startDate: task.startDate,
+			dueDate: task.dueDate,
+			category: task.category,
+			status: task.status
+		};
+
+		get(deleteMutation).mutate(task.id, {
+			onSuccess: () => {
+				toastStore.success('Aufgabe gelöscht', {
+					label: 'Rückgängig machen',
+					onClick: () => {
+						get(createMutation).mutate(taskToRestore);
+					}
+				});
+			}
+		});
+	}
+
+	function toggleDone(task: Task, checked: boolean) {
+		const nextStatus: TaskStatus = checked ? 'DONE' : 'OPEN';
+		get(updateMutation).mutate({
+			id: task.id,
+			input: {
+				title: task.title,
+				description: task.description ?? '',
+				startDate: task.startDate,
+				dueDate: task.dueDate,
+				category: task.category,
+				status: nextStatus
+			}
+		});
+	}
 </script>
 
 <svelte:head>
@@ -63,14 +103,31 @@
 				<ul class="space-y-2">
 					{#each tasksList as task (task.id)}
 						<li
-							class="flex flex-row items-center justify-between gap-4 rounded-lg border border-border bg-card/30 p-4 shadow-sm"
+							class="flex flex-row items-center justify-between gap-3 rounded-lg border border-border bg-card/30 p-4 shadow-sm"
 						>
 							<button
 								type="button"
-								class="-m-2 min-w-0 flex-1 cursor-pointer rounded-md p-1 text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline"
+								class="text-muted-foreground hover:text-foreground cursor-pointer"
+								onclick={() => toggleDone(task, task.status !== 'DONE')}
+								aria-label={`Aufgabe ${task.title} abhaken`}
+							>
+								{#if task.status === 'DONE'}
+									<CircleCheckBig class="size-4" />
+								{:else}
+									<Circle class="size-4" />
+								{/if}
+							</button>
+							<button
+								type="button"
+								class="-m-2 min-w-0 flex-1 cursor-pointer rounded-md p-1 text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline {task.status ===
+								'DONE'
+									? 'opacity-60'
+									: ''}"
 								onclick={() => createTaskDialogStore.openForEdit(task)}
 							>
-								<p class="truncate font-medium">{task.title}</p>
+								<p class="truncate font-medium {task.status === 'DONE' ? 'line-through' : ''}">
+									{task.title}
+								</p>
 								{#if task.description}
 									<p class="mt-0.5 truncate text-sm text-muted-foreground">{task.description}</p>
 								{/if}
@@ -90,10 +147,8 @@
 							<Button
 								variant="ghost"
 								size="icon"
-								onclick={() => {
-									taskToDelete = task;
-									deleteDialogOpen = true;
-								}}
+								onclick={() => handleDelete(task)}
+								disabled={$deleteMutation.isPending}
 								aria-label="Aufgabe löschen"
 							>
 								<TrashIcon />
@@ -109,9 +164,3 @@
 		{/if}
 	</div>
 </section>
-
-<DeleteTaskDialog
-	bind:open={deleteDialogOpen}
-	task={taskToDelete}
-	onOpenChange={(o) => !o && (taskToDelete = null)}
-/>

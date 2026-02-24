@@ -6,80 +6,209 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { createTaskDialogStore } from './create-task-dialog-store';
-	import { createTaskMutation, updateTaskMutation } from '$lib/features/tasks/queries';
+	import {
+		createTaskMutation,
+		updateTaskMutation,
+		deleteTaskMutation,
+		batchCreateTasksMutation
+	} from '$lib/features/tasks/queries';
 	import type {
 		CreateTaskInput,
 		UpdateTaskInput,
 		TaskPriorityCategory,
 		TaskStatus
 	} from '$lib/features/tasks/types';
+	import {
+		generateRecurringTasks,
+		type RecurrenceFrequency
+	} from '$lib/features/calendar/recurring-utils';
+	import { saveTaskTime } from '$lib/features/calendar/task-time-store';
+	import { toastStore } from '$lib/stores/toast-store';
 
 	const today = new Date().toISOString().slice(0, 10);
 
 	const createMutation = createTaskMutation();
 	const updateMutation = updateTaskMutation();
+	const deleteMutation = deleteTaskMutation();
+	const batchMutation = batchCreateTasksMutation();
+
+	let isRecurring = $state(false);
+	let recurringFrequency = $state<RecurrenceFrequency>('weekly');
+	let recurringOccurrences = $state(4);
 
 	const dialogState = $derived($createTaskDialogStore);
 	const isEdit = $derived(
 		dialogState !== null && typeof dialogState === 'object' && dialogState.mode === 'edit'
 	);
 	const editTask = $derived(
-		isEdit && dialogState !== null && typeof dialogState === 'object' ? dialogState.task : null
+		dialogState !== null && typeof dialogState === 'object' && dialogState.mode === 'edit'
+			? dialogState.task
+			: null
 	);
 	const isOpen = $derived(dialogState !== null);
+	const prefilledDate = $derived(
+		dialogState !== null &&
+			typeof dialogState === 'object' &&
+			dialogState.mode === 'create' &&
+			'date' in dialogState
+			? dialogState.date
+			: null
+	);
 
 	// Edit form state
 	let editTitle = $state('');
 	let editDescription = $state('');
-	let editStartDate = $state(today);
+	let editStartDate = $state(`${today}T00:00`);
 	let editDueDate = $state('');
 	let editCategory = $state<TaskPriorityCategory>('A');
 	let editStatus = $state<TaskStatus>('OPEN');
+
+	function toDateTimeLocal(dateStr: string, defaultTime: string = '00:00'): string {
+		if (!dateStr) return '';
+		// If already in datetime format (contains 'T'), just take the datetime part
+		if (dateStr.includes('T')) {
+			return dateStr.slice(0, 16);
+		}
+		// Otherwise it's a date-only string, append default time
+		return `${dateStr}T${defaultTime}`;
+	}
 
 	$effect(() => {
 		const task = editTask;
 		if (task) {
 			editTitle = task.title;
 			editDescription = task.description ?? '';
-			editStartDate = task.startDate;
-			editDueDate = task.dueDate;
+			// Convert date/datetime strings to datetime-local format
+			editStartDate = toDateTimeLocal(task.startDate, '00:00');
+			editDueDate = toDateTimeLocal(task.dueDate, '23:59');
 			editCategory = task.category;
 			editStatus = task.status;
 		}
 	});
 
+	// Get pending time from drag-to-create
+	function getPendingTimeDefaults(): { startDate: string; dueDate: string } {
+		// Only access window in browser
+		if (typeof window !== 'undefined') {
+			const pendingTime = (window as any).__pendingTaskTime;
+			if (pendingTime && prefilledDate) {
+				return {
+					startDate: `${prefilledDate}T${pendingTime.startTime}`,
+					dueDate: `${prefilledDate}T${pendingTime.endTime}`
+				};
+			}
+		}
+		return {
+			startDate: prefilledDate ? `${prefilledDate}T00:00` : `${today}T00:00`,
+			dueDate: prefilledDate ? `${prefilledDate}T23:59` : ''
+		};
+	}
+
 	// Create form (TanStack)
-	const form = createForm(() => ({
-		defaultValues: {
-			title: '',
-			description: '',
-			startDate: today,
-			dueDate: '',
-			category: 'A' as TaskPriorityCategory,
-			status: 'OPEN' as TaskStatus
-		},
-		onSubmit: async ({ value }) => {
+	const form = createForm(() => {
+		const timeDefaults = getPendingTimeDefaults();
+		return {
+			defaultValues: {
+				title: '',
+				description: '',
+				startDate: timeDefaults.startDate,
+				dueDate: timeDefaults.dueDate,
+				category: 'A' as TaskPriorityCategory,
+				status: 'OPEN' as TaskStatus
+			},
+			onSubmit: async ({ value }) => {
+			// Convert datetime-local format to ISO datetime strings
+			const startDateTime = value.startDate ? `${value.startDate}:00` : '';
+			const dueDateTime = value.dueDate ? `${value.dueDate}:00` : '';
+
 			const input: CreateTaskInput = {
 				...value,
 				title: value.title.trim(),
-				description: value.description?.trim() ?? ''
+				description: value.description?.trim() ?? '',
+				startDate: startDateTime,
+				dueDate: dueDateTime
 			};
 			if (!input.title) return;
-			const mut = get(createMutation);
-			mut.mutate(input);
+
+			if (isRecurring) {
+				// Create recurring tasks
+				const tasks = generateRecurringTasks({
+					title: input.title,
+					description: input.description,
+					startDate: input.startDate,
+					frequency: recurringFrequency,
+					occurrences: recurringOccurrences,
+					category: input.category,
+					status: input.status
+				});
+				const mut = get(batchMutation);
+				mut.mutate(tasks);
+			} else {
+				// Create single task
+				const mut = get(createMutation);
+				mut.mutate(input, {
+					onSuccess: (createdTask) => {
+						// Save time if it was set via drag-to-create
+						if (typeof window !== 'undefined') {
+							const pendingTime = (window as any).__pendingTaskTime;
+							if (pendingTime && createdTask?.id) {
+								saveTaskTime(createdTask.id, pendingTime.startTime, pendingTime.endTime);
+								delete (window as any).__pendingTaskTime;
+							}
+						}
+					}
+				});
+			}
+
 			form.reset();
+			isRecurring = false;
 			createTaskDialogStore.close();
 		}
-	}));
+		};
+	});
+
+	// Reset form when dialog opens with prefilled date
+	$effect(() => {
+		if (prefilledDate && !isEdit && typeof window !== 'undefined') {
+			const pendingTime = (window as any).__pendingTaskTime;
+			const startDate = pendingTime
+				? `${prefilledDate}T${pendingTime.startTime}`
+				: `${prefilledDate}T00:00`;
+			const dueDate = pendingTime
+				? `${prefilledDate}T${pendingTime.endTime}`
+				: `${prefilledDate}T23:59`;
+
+			form.reset();
+			form.setFieldValue('startDate', startDate);
+			form.setFieldValue('dueDate', dueDate);
+		}
+	});
 
 	function submitEdit(e: Event) {
 		e.preventDefault();
 		if (!editTask || !editTitle.trim()) return;
+
+		if (editTask.id.startsWith('project-card-')) {
+			const bridge = (window as any).__projectCardDialogBridge as
+				| {
+						updateCard?: (cardId: string, title: string, done: boolean) => void;
+					}
+				| undefined;
+			const cardId = editTask.id.replace('project-card-', '');
+			bridge?.updateCard?.(cardId, editTitle.trim(), editStatus === 'DONE');
+			createTaskDialogStore.close();
+			return;
+		}
+
+		// Convert datetime-local format to ISO datetime strings
+		const startDateTime = editStartDate ? `${editStartDate}:00` : '';
+		const dueDateTime = editDueDate ? `${editDueDate}:00` : '';
+
 		const input: UpdateTaskInput = {
 			title: editTitle.trim(),
 			description: editDescription.trim(),
-			startDate: editStartDate,
-			dueDate: editDueDate,
+			startDate: startDateTime,
+			dueDate: dueDateTime,
 			category: editCategory,
 			status: editStatus
 		};
@@ -89,6 +218,48 @@
 				onSuccess: () => createTaskDialogStore.close()
 			}
 		);
+	}
+
+	function handleDelete() {
+		if (!editTask) return;
+
+		if (editTask.id.startsWith('project-card-')) {
+			const bridge = (window as any).__projectCardDialogBridge as
+				| {
+						deleteCard?: (cardId: string) => void;
+					}
+				| undefined;
+			const cardId = editTask.id.replace('project-card-', '');
+			bridge?.deleteCard?.(cardId);
+			createTaskDialogStore.close();
+			return;
+		}
+
+		// Store task data for undo functionality
+		const taskToRestore: CreateTaskInput = {
+			title: editTask.title,
+			description: editTask.description ?? '',
+			startDate: editTask.startDate,
+			dueDate: editTask.dueDate,
+			category: editTask.category,
+			status: editTask.status
+		};
+
+		// Delete immediately
+		get(deleteMutation).mutate(editTask.id, {
+			onSuccess: () => {
+				createTaskDialogStore.close();
+
+				// Show toast with undo action
+				toastStore.success('Aufgabe gelöscht', {
+					label: 'Rückgängig machen',
+					onClick: () => {
+						// Recreate the task
+						get(createMutation).mutate(taskToRestore);
+					}
+				});
+			}
+		});
 	}
 
 	const statusLabels: Record<TaskStatus, string> = {
@@ -109,7 +280,7 @@
 </script>
 
 <Dialog.Root open={isOpen} onOpenChange={(open: boolean) => !open && createTaskDialogStore.close()}>
-	<Dialog.Content class="text-foreground sm:max-w-[425px]">
+	<Dialog.Content class="text-foreground sm:max-w-[425px] z-100">
 		<Dialog.Header>
 			<Dialog.Title>{isEdit ? 'Aufgabe bearbeiten' : 'Neue Aufgabe'}</Dialog.Title>
 			<Dialog.Description>
@@ -137,11 +308,11 @@
 				<div class="grid grid-cols-2 gap-4">
 					<div class="grid gap-2">
 						<Label for="task-startDate">Start</Label>
-						<Input id="task-startDate" type="date" bind:value={editStartDate} />
+						<Input id="task-startDate" type="datetime-local" bind:value={editStartDate} />
 					</div>
 					<div class="grid gap-2">
 						<Label for="task-dueDate">Fällig</Label>
-						<Input id="task-dueDate" type="date" bind:value={editDueDate} />
+						<Input id="task-dueDate" type="datetime-local" bind:value={editDueDate} />
 					</div>
 				</div>
 				<div class="grid grid-cols-2 gap-4">
@@ -163,15 +334,26 @@
 						</select>
 					</div>
 				</div>
-				<Dialog.Footer class="pt-4">
-					<Dialog.Close>
-						{#snippet child({ props }: { props: Record<string, unknown> })}
-							<Button {...props} variant="outline">Abbrechen</Button>
-						{/snippet}
-					</Dialog.Close>
-					<Button type="submit" disabled={$updateMutation.isPending}>
-						{$updateMutation.isPending ? 'Wird gespeichert…' : 'Speichern'}
+				<Dialog.Footer class="flex items-center justify-between pt-4">
+					<Button
+						type="button"
+						variant="destructive"
+						size="sm"
+						onclick={handleDelete}
+						disabled={$deleteMutation.isPending}
+					>
+						{$deleteMutation.isPending ? 'Wird gelöscht…' : 'Löschen'}
 					</Button>
+					<div class="flex gap-2">
+						<Dialog.Close>
+							{#snippet child({ props }: { props: Record<string, unknown> })}
+								<Button {...props} variant="outline">Abbrechen</Button>
+							{/snippet}
+						</Dialog.Close>
+						<Button type="submit" disabled={$updateMutation.isPending}>
+							{$updateMutation.isPending ? 'Wird gespeichert…' : 'Speichern'}
+						</Button>
+					</div>
 				</Dialog.Footer>
 			</form>
 		{:else}
@@ -230,7 +412,7 @@
 								<Label for="global-create-startDate">Start</Label>
 								<Input
 									id="global-create-startDate"
-									type="date"
+									type="datetime-local"
 									value={field.state.value}
 									onblur={() => field.handleBlur()}
 									oninput={(e) =>
@@ -245,7 +427,7 @@
 								<Label for="global-create-dueDate">Fällig</Label>
 								<Input
 									id="global-create-dueDate"
-									type="date"
+									type="datetime-local"
 									value={field.state.value}
 									onblur={() => field.handleBlur()}
 									oninput={(e) =>
@@ -298,6 +480,49 @@
 						{/snippet}
 					</form.Field>
 				</div>
+
+				<!-- Recurring Task Option -->
+				<div class="border-border space-y-3 rounded-md border p-3">
+					<div class="flex items-center gap-2">
+						<input
+							type="checkbox"
+							id="recurring-checkbox"
+							bind:checked={isRecurring}
+							class="border-input h-4 w-4 rounded border"
+						/>
+						<Label for="recurring-checkbox" class="cursor-pointer font-medium">
+							Wiederholen
+						</Label>
+					</div>
+
+					{#if isRecurring}
+						<div class="grid grid-cols-2 gap-3">
+							<div class="grid gap-2">
+								<Label for="recurring-frequency" class="text-sm">Frequenz</Label>
+								<select
+									id="recurring-frequency"
+									class={selectClass}
+									bind:value={recurringFrequency}
+								>
+									<option value="daily">Täglich</option>
+									<option value="weekly">Wöchentlich</option>
+									<option value="monthly">Monatlich</option>
+								</select>
+							</div>
+							<div class="grid gap-2">
+								<Label for="recurring-occurrences" class="text-sm">Anzahl</Label>
+								<Input
+									id="recurring-occurrences"
+									type="number"
+									min="1"
+									max="52"
+									bind:value={recurringOccurrences}
+								/>
+							</div>
+						</div>
+					{/if}
+				</div>
+
 				<Dialog.Footer class="pt-4">
 					<Dialog.Close>
 						{#snippet child({ props }: { props: Record<string, unknown> })}

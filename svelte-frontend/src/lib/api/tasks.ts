@@ -41,3 +41,26 @@ export async function deleteTask(id: string): Promise<void> {
 	const res = await apiFetch(`/tasks/${id}`, { method: 'DELETE' });
 	if (!res.ok) throw new Error(`Delete failed: ${res.status}`);
 }
+
+/**
+ * Fetch all tasks for the calendar view
+ * Currently uses /tasks/inbox, can be changed to /tasks when backend endpoint is available
+ */
+export async function fetchAllTasks(): Promise<Task[]> {
+	const res = await apiFetch('/tasks/inbox');
+	if (!res.ok) throw new Error(`All tasks fetch failed: ${res.status}`);
+	return res.json();
+}
+
+/**
+ * Create multiple tasks at once (for recurring tasks)
+ * Currently loops through individual creates, can be optimized with POST /tasks/batch when available
+ */
+export async function batchCreateTasks(inputs: CreateTaskInput[]): Promise<Task[]> {
+	const results: Task[] = [];
+	for (const input of inputs) {
+		const task = await createTask(input);
+		results.push(task);
+	}
+	return results;
+}

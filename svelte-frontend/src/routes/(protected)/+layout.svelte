@@ -4,6 +4,7 @@
 	import type { ComponentProps } from 'svelte';
 	import AppSidebar from '$lib/components/app-sidebar.svelte';
 	import CreateTaskDialog from '$lib/features/tasks/create-task-dialog.svelte';
+	import ToastContainer from '$lib/components/toast-container.svelte';
 
 	let { children } = $props();
 </script>
@@ -11,6 +12,7 @@
 <Sidebar.Provider>
 	<AppSidebar />
 	<CreateTaskDialog />
+	<ToastContainer />
 	<main class="h-screen w-full bg-background p-4 text-foreground">
 		<img
 			src="/background.png"

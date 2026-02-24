@@ -1,7 +1,7 @@
 package com.hardytec.venera.task.domain;
 
 import java.time.Instant;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import jakarta.persistence.*;
@@ -30,10 +30,10 @@ public class TaskItem {
     private String description;
 
     @Column(nullable = true)
-    private LocalDate startDate;
+    private LocalDateTime startDate;
 
     @Column(nullable = true)
-    private LocalDate dueDate;
+    private LocalDateTime dueDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -67,7 +67,7 @@ public class TaskItem {
         updatedAt = Instant.now();
     }
 
-    public TaskItem(UUID id, UUID userId, String title, String description, LocalDate startDate, LocalDate dueDate, TaskPriorityCategory category, TaskStatus status) {
+    public TaskItem(UUID id, UUID userId, String title, String description, LocalDateTime startDate, LocalDateTime dueDate, TaskPriorityCategory category, TaskStatus status) {
         this.id = id;
         this.userId = userId;
         this.title = title;
