@@ -3,3 +3,5 @@
 /.env.example
 /.pnpm-store
 /.vscode
+/.backend.pid
+/backend.log

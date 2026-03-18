@@ -11,6 +11,8 @@ export interface RecurringTaskInput {
 	occurrences: number;
 	category: TaskPriorityCategory;
 	status: TaskStatus;
+	estimatedDurationMinutes: number | null;
+	actualDurationMinutes: number | null;
 }
 
 /**
@@ -32,7 +34,9 @@ export function generateRecurringTasks(input: RecurringTaskInput): CreateTaskInp
 			startDate: startDateTime,
 			dueDate: dueDateTime,
 			category: input.category,
-			status: input.status
+			status: input.status,
+			estimatedDurationMinutes: input.estimatedDurationMinutes,
+			actualDurationMinutes: input.actualDurationMinutes
 		});
 
 		// Increment date based on frequency

@@ -11,7 +11,9 @@ import java.util.UUID;
 
 @Repository
 public interface TaskSpringDataRepository extends JpaRepository<TaskItem, UUID> {
-    List<TaskItem> findByUserIdAndProjectIdIsNull(UUID userId);
-    List<TaskItem> findAllByUserIdAndProjectId(UUID userId, UUID projectId);
+    List<TaskItem> findByUserIdAndTeamIdIsNullAndProjectIdIsNull(UUID userId);
+    List<TaskItem> findAllByUserIdAndTeamIdIsNullAndProjectId(UUID userId, UUID projectId);
+    List<TaskItem> findByTeamIdAndProjectIdIsNull(UUID teamId);
+    List<TaskItem> findAllByTeamIdAndProjectId(UUID teamId, UUID projectId);
     Optional<TaskItem> findById(UUID id);
 }

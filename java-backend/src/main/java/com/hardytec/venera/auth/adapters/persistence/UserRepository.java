@@ -12,6 +12,8 @@ import com.hardytec.venera.auth.domain.UserAccount;
 public interface UserRepository extends JpaRepository<UserAccount, UUID> {
 
     Optional<UserAccount> findByEmail(String email);
+    Optional<UserAccount> findByEmailIgnoreCase(String email);
 
     boolean existsByEmail(String email);
+    boolean existsByEmailIgnoreCase(String email);
 }

@@ -19,6 +19,8 @@ public class TaskDTO {
     private LocalDateTime dueDate;
     private TaskPriorityCategory category;
     private TaskStatus status;
+    private Integer estimatedDurationMinutes;
+    private Integer actualDurationMinutes;
 
     public static TaskDTO from(TaskItem taskItem) {
         return new TaskDTO(
@@ -28,7 +30,9 @@ public class TaskDTO {
             taskItem.getStartDate(),
             taskItem.getDueDate(),
             taskItem.getCategory(),
-            taskItem.getStatus()
+            taskItem.getStatus(),
+            taskItem.getEstimatedDurationMinutes(),
+            taskItem.getActualDurationMinutes()
         );
     }
 }

@@ -2,6 +2,7 @@ package com.hardytec.venera.task.adapters.web.task.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.time.LocalDateTime;
 import com.hardytec.venera.task.domain.TaskPriorityCategory;
@@ -17,4 +18,6 @@ public class CreateTaskDTO {
     LocalDateTime dueDate;
     @NotNull TaskPriorityCategory category;
     @NotNull TaskStatus status;
+    @PositiveOrZero Integer estimatedDurationMinutes;
+    @PositiveOrZero Integer actualDurationMinutes;
 }

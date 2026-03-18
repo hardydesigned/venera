@@ -11,6 +11,7 @@
 	} from './calendar-utils';
 	import { createTaskDialogStore } from '$lib/features/tasks/create-task-dialog-store';
 	import { updateTaskMutation } from '$lib/features/tasks/queries';
+	import { playTaskSuccessSound } from '$lib/features/tasks/task-sound';
 	import { Circle, CircleCheckBig } from '@lucide/svelte';
 	import {
 		getTaskTime,
@@ -188,7 +189,9 @@
 					startDate: timeToDateTime(dateStr, startTime),
 					dueDate: timeToDateTime(dateStr, endTime),
 					category: task.category,
-					status: task.status
+					status: task.status,
+					estimatedDurationMinutes: task.estimatedDurationMinutes,
+					actualDurationMinutes: task.actualDurationMinutes
 				}
 			},
 			{
@@ -343,6 +346,9 @@
 		e.preventDefault();
 		e.stopPropagation();
 		const nextStatus = task.status === 'DONE' ? 'OPEN' : 'DONE';
+		if (nextStatus === 'DONE') {
+			playTaskSuccessSound();
+		}
 		$updateMutation.mutate({
 			id: task.id,
 			input: {
@@ -351,7 +357,9 @@
 				startDate: task.startDate,
 				dueDate: task.dueDate,
 				category: task.category,
-				status: nextStatus
+				status: nextStatus,
+				estimatedDurationMinutes: task.estimatedDurationMinutes,
+				actualDurationMinutes: task.actualDurationMinutes
 			}
 		});
 	}

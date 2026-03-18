@@ -1,5 +1,6 @@
 import { env } from '$env/dynamic/public';
 import { clearAuth } from '$lib/auth/auth-store';
+import { getActiveTeamId } from '$lib/features/teams/team-context-store';
 
 const API_BASE = env.PUBLIC_API_BASE_URL ?? 'http://localhost:8080';
 
@@ -19,8 +20,13 @@ export async function
 		...(options.headers as Record<string, string>)
 	};
 
-	if (!headers['Content-Type'] && options.body) {
+	if (!headers['Content-Type'] && options.body && !isFormDataBody(options.body)) {
 		headers['Content-Type'] = 'application/json';
+	}
+
+	const teamId = getActiveTeamId();
+	if (teamId && !headers['X-Team-Id']) {
+		headers['X-Team-Id'] = teamId;
 	}
 
 	if (isStateChangingMethod(method)) {
@@ -47,6 +53,10 @@ export async function
 
 function isStateChangingMethod(method: string): boolean {
 	return method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE';
+}
+
+function isFormDataBody(body: BodyInit): boolean {
+	return typeof FormData !== 'undefined' && body instanceof FormData;
 }
 
 function readCookie(name: string): string | null {

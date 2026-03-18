@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import type { TaskPriorityCategory, TaskStatus } from '$lib/features/tasks/types';
+import { getActiveScopeKey, teamScopeStore } from '$lib/features/teams/team-context-store';
 
 export type CalendarView = 'month' | 'week' | 'day' | 'year';
 
@@ -16,12 +17,16 @@ export interface CalendarState {
 	searchQuery: string;
 }
 
-const STORAGE_KEY = 'venera_calendar_view';
+const BASE_STORAGE_KEY = 'venera_calendar_view';
 
-function loadSavedView(): CalendarView {
+function storageKeyForScope(scopeKey: string): string {
+	return `${BASE_STORAGE_KEY}:${scopeKey}`;
+}
+
+function loadSavedView(scopeKey: string): CalendarView {
 	if (typeof window === 'undefined') return 'month';
 	try {
-		const saved = localStorage.getItem(STORAGE_KEY);
+		const saved = localStorage.getItem(storageKeyForScope(scopeKey));
 		if (saved && ['month', 'week', 'day', 'year'].includes(saved)) {
 			return saved as CalendarView;
 		}
@@ -32,7 +37,7 @@ function loadSavedView(): CalendarView {
 }
 
 const initialState: CalendarState = {
-	view: loadSavedView(),
+	view: loadSavedView(getActiveScopeKey()),
 	currentDate: new Date(),
 	filters: {
 		priorities: new Set<TaskPriorityCategory>(['A', 'B', 'C']),
@@ -45,12 +50,19 @@ const initialState: CalendarState = {
 function createCalendarStore() {
 	const { subscribe, set, update } = writable<CalendarState>(initialState);
 
+	if (typeof window !== 'undefined') {
+		teamScopeStore.subscribe(() => {
+			const nextView = loadSavedView(getActiveScopeKey());
+			update((state) => ({ ...state, view: nextView }));
+		});
+	}
+
 	return {
 		subscribe,
 		setView: (view: CalendarView) => {
 			if (typeof window !== 'undefined') {
 				try {
-					localStorage.setItem(STORAGE_KEY, view);
+					localStorage.setItem(storageKeyForScope(getActiveScopeKey()), view);
 				} catch (e) {
 					console.error('Failed to save view', e);
 				}
@@ -154,7 +166,12 @@ function createCalendarStore() {
 				};
 			}),
 		setSearchQuery: (query: string) => update((state) => ({ ...state, searchQuery: query })),
-		reset: () => set(initialState)
+		reset: () =>
+			set({
+				...initialState,
+				view: loadSavedView(getActiveScopeKey()),
+				currentDate: new Date()
+			})
 	};
 }
 

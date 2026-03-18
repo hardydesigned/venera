@@ -62,6 +62,17 @@
 	let editDueDate = $state('');
 	let editCategory = $state<TaskPriorityCategory>('A');
 	let editStatus = $state<TaskStatus>('OPEN');
+	let editEstimatedDuration = $state('');
+	let editActualDuration = $state('');
+
+	function parseDurationMinutes(raw: string | number | null | undefined): number | null {
+		if (raw === null || raw === undefined) return null;
+		const normalized = typeof raw === 'string' ? raw.trim() : String(raw);
+		if (!normalized) return null;
+		const value = Number(normalized);
+		if (!Number.isFinite(value) || value < 0) return null;
+		return Math.round(value);
+	}
 
 	function toDateTimeLocal(dateStr: string, defaultTime: string = '00:00'): string {
 		if (!dateStr) return '';
@@ -83,6 +94,9 @@
 			editDueDate = toDateTimeLocal(task.dueDate, '23:59');
 			editCategory = task.category;
 			editStatus = task.status;
+			editEstimatedDuration =
+				task.estimatedDurationMinutes === null ? '' : String(task.estimatedDurationMinutes);
+			editActualDuration = task.actualDurationMinutes === null ? '' : String(task.actualDurationMinutes);
 		}
 	});
 
@@ -114,7 +128,9 @@
 				startDate: timeDefaults.startDate,
 				dueDate: timeDefaults.dueDate,
 				category: 'A' as TaskPriorityCategory,
-				status: 'OPEN' as TaskStatus
+				status: 'OPEN' as TaskStatus,
+				estimatedDurationMinutes: '',
+				actualDurationMinutes: ''
 			},
 			onSubmit: async ({ value }) => {
 			// Convert datetime-local format to ISO datetime strings
@@ -126,7 +142,9 @@
 				title: value.title.trim(),
 				description: value.description?.trim() ?? '',
 				startDate: startDateTime,
-				dueDate: dueDateTime
+				dueDate: dueDateTime,
+				estimatedDurationMinutes: parseDurationMinutes(value.estimatedDurationMinutes),
+				actualDurationMinutes: parseDurationMinutes(value.actualDurationMinutes)
 			};
 			if (!input.title) return;
 
@@ -139,7 +157,9 @@
 					frequency: recurringFrequency,
 					occurrences: recurringOccurrences,
 					category: input.category,
-					status: input.status
+					status: input.status,
+					estimatedDurationMinutes: input.estimatedDurationMinutes,
+					actualDurationMinutes: input.actualDurationMinutes
 				});
 				const mut = get(batchMutation);
 				mut.mutate(tasks);
@@ -191,11 +211,26 @@
 		if (editTask.id.startsWith('project-card-')) {
 			const bridge = (window as any).__projectCardDialogBridge as
 				| {
-						updateCard?: (cardId: string, title: string, done: boolean) => void;
+						updateCard?: (
+							cardId: string,
+							input: {
+								title: string;
+								description: string;
+								done: boolean;
+								startDate: string;
+								dueDate: string;
+							}
+						) => void;
 					}
 				| undefined;
 			const cardId = editTask.id.replace('project-card-', '');
-			bridge?.updateCard?.(cardId, editTitle.trim(), editStatus === 'DONE');
+			bridge?.updateCard?.(cardId, {
+				title: editTitle.trim(),
+				description: editDescription.trim(),
+				done: editStatus === 'DONE',
+				startDate: editStartDate ? `${editStartDate}:00` : '',
+				dueDate: editDueDate ? `${editDueDate}:00` : ''
+			});
 			createTaskDialogStore.close();
 			return;
 		}
@@ -210,7 +245,9 @@
 			startDate: startDateTime,
 			dueDate: dueDateTime,
 			category: editCategory,
-			status: editStatus
+			status: editStatus,
+			estimatedDurationMinutes: parseDurationMinutes(editEstimatedDuration),
+			actualDurationMinutes: parseDurationMinutes(editActualDuration)
 		};
 		get(updateMutation).mutate(
 			{ id: editTask.id, input },
@@ -242,7 +279,9 @@
 			startDate: editTask.startDate,
 			dueDate: editTask.dueDate,
 			category: editTask.category,
-			status: editTask.status
+			status: editTask.status,
+			estimatedDurationMinutes: editTask.estimatedDurationMinutes,
+			actualDurationMinutes: editTask.actualDurationMinutes
 		};
 
 		// Delete immediately
@@ -313,6 +352,30 @@
 					<div class="grid gap-2">
 						<Label for="task-dueDate">Fällig</Label>
 						<Input id="task-dueDate" type="datetime-local" bind:value={editDueDate} />
+					</div>
+				</div>
+				<div class="grid grid-cols-2 gap-4">
+					<div class="grid gap-2">
+						<Label for="task-estimatedDuration">Dauerschätzung (Min)</Label>
+						<Input
+							id="task-estimatedDuration"
+							type="number"
+							min="0"
+							step="1"
+							placeholder="z. B. 60"
+							bind:value={editEstimatedDuration}
+						/>
+					</div>
+					<div class="grid gap-2">
+						<Label for="task-actualDuration">Tatsächliche Dauer (Min)</Label>
+						<Input
+							id="task-actualDuration"
+							type="number"
+							min="0"
+							step="1"
+							placeholder="z. B. 45"
+							bind:value={editActualDuration}
+						/>
 					</div>
 				</div>
 				<div class="grid grid-cols-2 gap-4">
@@ -476,6 +539,44 @@
 									<option value="DONE">{statusLabels.DONE}</option>
 									<option value="CANCELLED">{statusLabels.CANCELLED}</option>
 								</select>
+							</div>
+						{/snippet}
+					</form.Field>
+				</div>
+				<div class="grid grid-cols-2 gap-4">
+					<form.Field name="estimatedDurationMinutes">
+						{#snippet children(field)}
+							<div class="grid gap-2">
+								<Label for="global-create-estimatedDuration">Dauerschätzung (Min)</Label>
+								<Input
+									id="global-create-estimatedDuration"
+									type="number"
+									min="0"
+									step="1"
+									placeholder="z. B. 60"
+									value={field.state.value}
+									onblur={() => field.handleBlur()}
+									oninput={(e) =>
+										field.handleChange((e.currentTarget as HTMLInputElement)?.value ?? '')}
+								/>
+							</div>
+						{/snippet}
+					</form.Field>
+					<form.Field name="actualDurationMinutes">
+						{#snippet children(field)}
+							<div class="grid gap-2">
+								<Label for="global-create-actualDuration">Tatsächliche Dauer (Min)</Label>
+								<Input
+									id="global-create-actualDuration"
+									type="number"
+									min="0"
+									step="1"
+									placeholder="z. B. 45"
+									value={field.state.value}
+									onblur={() => field.handleBlur()}
+									oninput={(e) =>
+										field.handleChange((e.currentTarget as HTMLInputElement)?.value ?? '')}
+								/>
 							</div>
 						{/snippet}
 					</form.Field>

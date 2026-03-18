@@ -1,0 +1,2 @@
+# Für transcribe_whisper.py
+openai-whisper>=20231117

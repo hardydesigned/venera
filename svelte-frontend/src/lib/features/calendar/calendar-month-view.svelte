@@ -11,6 +11,7 @@
 	} from './calendar-utils';
 	import { createTaskDialogStore } from '$lib/features/tasks/create-task-dialog-store';
 	import { updateTaskMutation } from '$lib/features/tasks/queries';
+	import { playTaskSuccessSound } from '$lib/features/tasks/task-sound';
 	import { Circle, CircleCheckBig } from '@lucide/svelte';
 
 	interface Props {
@@ -63,7 +64,9 @@
 
 		// Extract time from existing datetime or use default
 		const existingDueTime = task.dueDate.includes('T') ? task.dueDate.split('T')[1] : '23:59:00';
-		const existingStartTime = task.startDate.includes('T') ? task.startDate.split('T')[1] : '00:00:00';
+		const existingStartTime = task.startDate.includes('T')
+			? task.startDate.split('T')[1]
+			: '00:00:00';
 
 		const newDueDateTime = `${newDate}T${existingDueTime}`;
 		const newStartDateTime = `${newDate}T${existingStartTime}`;
@@ -77,7 +80,9 @@
 				startDate: newStartDateTime,
 				dueDate: newDueDateTime,
 				category: task.category,
-				status: task.status
+				status: task.status,
+				estimatedDurationMinutes: task.estimatedDurationMinutes,
+				actualDurationMinutes: task.actualDurationMinutes
 			}
 		});
 	}
@@ -95,6 +100,9 @@
 		e.preventDefault();
 		e.stopPropagation();
 		const nextStatus = task.status === 'DONE' ? 'OPEN' : 'DONE';
+		if (nextStatus === 'DONE') {
+			playTaskSuccessSound();
+		}
 		$updateMutation.mutate({
 			id: task.id,
 			input: {
@@ -103,15 +111,17 @@
 				startDate: task.startDate,
 				dueDate: task.dueDate,
 				category: task.category,
-				status: nextStatus
+				status: nextStatus,
+				estimatedDurationMinutes: task.estimatedDurationMinutes,
+				actualDurationMinutes: task.actualDurationMinutes
 			}
 		});
 	}
 </script>
 
-<div class="flex flex-col h-full">
+<div class="flex h-full flex-col">
 	<!-- Month/Year Header -->
-	<div class="border-border bg-muted/30 border-b px-4 py-3">
+	<div class="border-b border-border bg-muted/30 px-4 py-3">
 		<h2 class="text-lg font-semibold">
 			{getMonthName(month)}
 			{year}
@@ -120,10 +130,15 @@
 
 	<!-- Calendar Grid -->
 	<div class="flex-1 overflow-auto">
-		<div class="grid h-full" style="grid-template-columns: repeat(7, 1fr);">
+		<div
+			class="grid h-full min-h-[680px]"
+			style="grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: auto repeat(6, minmax(0, 1fr));"
+		>
 			<!-- Weekday Headers -->
 			{#each weekdayLabels as label}
-				<div class="border-border bg-muted/50 border-b border-r p-2 text-center text-sm font-medium">
+				<div
+					class="border-r border-b border-border bg-muted/50 p-2 text-center text-sm font-medium"
+				>
 					{label}
 				</div>
 			{/each}
@@ -134,7 +149,7 @@
 				{@const isTodayCell = isToday(date)}
 				{@const isInMonth = isCurrentMonth(date)}
 				<div
-					class="border-border group relative min-h-[120px] border-b border-r p-2 transition-colors hover:bg-muted/50 {!isInMonth
+					class="group relative flex min-h-0 flex-col border-r border-b border-border p-2 transition-colors hover:bg-muted/50 {!isInMonth
 						? 'bg-muted/20'
 						: ''}"
 					ondblclick={() => handleDayDoubleClick(date)}
@@ -158,12 +173,12 @@
 					</div>
 
 					<!-- Tasks -->
-					<div class="space-y-1">
-						{#each dayTasks.slice(0, 3) as task (task.id)}
+					<div class="min-h-0 flex-1 space-y-1 overflow-y-auto pr-1">
+						{#each dayTasks as task (task.id)}
 							<div
 								role="button"
 								tabindex={0}
-								class="bg-card/85 hover:bg-card relative flex w-full items-center gap-1 overflow-hidden rounded-md border px-1.5 py-1 text-left text-xs transition-colors {task.status ===
+								class="relative flex w-full items-center gap-1 overflow-hidden rounded-md border bg-card/85 px-1.5 py-1 text-left text-xs transition-colors hover:bg-card {task.status ===
 								'DONE'
 									? 'opacity-55 grayscale-[0.2]'
 									: ''}"
@@ -174,7 +189,7 @@
 							>
 								<button
 									type="button"
-									class="text-muted-foreground hover:text-foreground shrink-0 cursor-pointer"
+									class="shrink-0 cursor-pointer text-muted-foreground hover:text-foreground"
 									onclick={(e) => toggleDone(task, e)}
 									aria-label={`Aufgabe ${task.title} abhaken`}
 								>
@@ -189,14 +204,6 @@
 								</span>
 							</div>
 						{/each}
-						{#if dayTasks.length > 3}
-							<button
-								class="text-muted-foreground hover:text-foreground w-full rounded px-2 py-1 text-left text-xs transition-colors"
-								onclick={() => handleDayDoubleClick(date)}
-							>
-								+{dayTasks.length - 3} weitere
-							</button>
-						{/if}
 					</div>
 				</div>
 			{/each}

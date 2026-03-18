@@ -21,6 +21,9 @@ public class TaskItem {
     private UUID userId;
 
     @Column(nullable = true)
+    private UUID teamId;
+
+    @Column(nullable = true)
     private UUID projectId;
 
     @Column(nullable = false)
@@ -42,6 +45,12 @@ public class TaskItem {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TaskStatus status;
+
+    @Column(nullable = true)
+    private Integer estimatedDurationMinutes;
+
+    @Column(nullable = true)
+    private Integer actualDurationMinutes;
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
@@ -67,14 +76,28 @@ public class TaskItem {
         updatedAt = Instant.now();
     }
 
-    public TaskItem(UUID id, UUID userId, String title, String description, LocalDateTime startDate, LocalDateTime dueDate, TaskPriorityCategory category, TaskStatus status) {
+    public TaskItem(
+            UUID id,
+            UUID userId,
+            UUID teamId,
+            String title,
+            String description,
+            LocalDateTime startDate,
+            LocalDateTime dueDate,
+            TaskPriorityCategory category,
+            TaskStatus status,
+            Integer estimatedDurationMinutes,
+            Integer actualDurationMinutes) {
         this.id = id;
         this.userId = userId;
+        this.teamId = teamId;
         this.title = title;
         this.description = description;
         this.startDate = startDate;
         this.dueDate = dueDate;
         this.category = category;
         this.status = status;
+        this.estimatedDurationMinutes = estimatedDurationMinutes;
+        this.actualDurationMinutes = actualDurationMinutes;
     }
 }

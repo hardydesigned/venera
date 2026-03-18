@@ -9,6 +9,8 @@ export interface Task {
 	dueDate: string;
 	category: TaskPriorityCategory;
 	status: TaskStatus;
+	estimatedDurationMinutes: number | null;
+	actualDurationMinutes: number | null;
 }
 
 export interface CreateTaskInput {
@@ -18,6 +20,8 @@ export interface CreateTaskInput {
 	dueDate: string;
 	category: TaskPriorityCategory;
 	status: TaskStatus;
+	estimatedDurationMinutes: number | null;
+	actualDurationMinutes: number | null;
 }
 
 export interface UpdateTaskInput {
@@ -27,4 +31,6 @@ export interface UpdateTaskInput {
 	dueDate: string;
 	category: TaskPriorityCategory;
 	status: TaskStatus;
+	estimatedDurationMinutes: number | null;
+	actualDurationMinutes: number | null;
 }

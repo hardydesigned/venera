@@ -13,6 +13,7 @@
 		TaskStatus
 	} from '$lib/features/tasks/types';
 	import { createTaskDialogStore } from '$lib/features/tasks/create-task-dialog-store';
+	import { playTaskSuccessSound } from '$lib/features/tasks/task-sound';
 	import { TrashIcon, PlusIcon, Circle, CircleCheckBig } from '@lucide/svelte';
 	import { toastStore } from '$lib/stores/toast-store';
 	import { get } from 'svelte/store';
@@ -36,7 +37,9 @@
 			startDate: task.startDate,
 			dueDate: task.dueDate,
 			category: task.category,
-			status: task.status
+			status: task.status,
+			estimatedDurationMinutes: task.estimatedDurationMinutes,
+			actualDurationMinutes: task.actualDurationMinutes
 		};
 
 		get(deleteMutation).mutate(task.id, {
@@ -53,6 +56,9 @@
 
 	function toggleDone(task: Task, checked: boolean) {
 		const nextStatus: TaskStatus = checked ? 'DONE' : 'OPEN';
+		if (checked) {
+			playTaskSuccessSound();
+		}
 		get(updateMutation).mutate({
 			id: task.id,
 			input: {
@@ -61,7 +67,9 @@
 				startDate: task.startDate,
 				dueDate: task.dueDate,
 				category: task.category,
-				status: nextStatus
+				status: nextStatus,
+				estimatedDurationMinutes: task.estimatedDurationMinutes,
+				actualDurationMinutes: task.actualDurationMinutes
 			}
 		});
 	}

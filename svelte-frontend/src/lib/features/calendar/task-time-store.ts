@@ -3,7 +3,13 @@
  * Since the backend only stores dates (LocalDate), we store times separately in localStorage
  */
 
-const STORAGE_KEY = 'venera_task_times';
+import { getActiveScopeKey } from '$lib/features/teams/team-context-store';
+
+const BASE_STORAGE_KEY = 'venera_task_times';
+
+function storageKeyForActiveScope(): string {
+	return `${BASE_STORAGE_KEY}:${getActiveScopeKey()}`;
+}
 
 export interface TaskTime {
 	taskId: string;
@@ -18,7 +24,7 @@ export function loadTaskTimes(): Map<string, TaskTime> {
 	if (typeof window === 'undefined') return new Map();
 
 	try {
-		const data = localStorage.getItem(STORAGE_KEY);
+		const data = localStorage.getItem(storageKeyForActiveScope());
 		if (!data) return new Map();
 
 		const parsed: TaskTime[] = JSON.parse(data);
@@ -40,7 +46,7 @@ export function saveTaskTime(taskId: string, startTime: string, endTime: string)
 		times.set(taskId, { taskId, startTime, endTime });
 
 		const data = Array.from(times.values());
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+		localStorage.setItem(storageKeyForActiveScope(), JSON.stringify(data));
 	} catch (e) {
 		console.error('Failed to save task time', e);
 	}
@@ -65,7 +71,7 @@ export function deleteTaskTime(taskId: string): void {
 		times.delete(taskId);
 
 		const data = Array.from(times.values());
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+		localStorage.setItem(storageKeyForActiveScope(), JSON.stringify(data));
 	} catch (e) {
 		console.error('Failed to delete task time', e);
 	}
