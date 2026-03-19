@@ -193,10 +193,6 @@
 				<CalendarDaysIcon class="size-4" />
 				Woche
 			</Button>
-			<Button variant="ghost" class="w-full justify-start" href="/finance">
-				<WalletIcon class="size-4" />
-				Finanzmanager
-			</Button>
 			<Sidebar.Separator />
 
 			<Collapsible.Root open={true} class="w-full">
