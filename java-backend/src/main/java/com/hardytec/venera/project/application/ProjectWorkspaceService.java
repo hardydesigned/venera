@@ -14,6 +14,8 @@ import com.hardytec.venera.project.domain.WorkspaceProjectList;
 import com.hardytec.venera.task.adapters.persistence.task.TaskSpringDataRepository;
 import com.hardytec.venera.task.domain.TaskItem;
 import com.hardytec.venera.team.application.TeamService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,9 @@ public class ProjectWorkspaceService {
     private final ProjectWorkspaceRepository projectWorkspaceRepository;
     private final TaskSpringDataRepository taskRepository;
     private final TeamService teamService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public ProjectWorkspaceService(
             ProjectWorkspaceRepository projectWorkspaceRepository,
@@ -50,9 +55,25 @@ public class ProjectWorkspaceService {
         if (payload == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid project workspace payload");
         }
+
+        // Load workspace and clear all child collections
         ProjectWorkspace workspace = findOrCreateWorkspace(userId, teamId);
-        applyPayload(workspace, payload);
-        return ProjectWorkspace.toDto(projectWorkspaceRepository.save(workspace));
+        workspace.getFolders().clear();
+        workspace.getProjects().clear();
+
+        // Flush orphan-removal DELETEs to the DB before any INSERTs occur.
+        // Hibernate inserts before deletes by default, causing PK conflicts when
+        // re-inserting entities with the same IDs.
+        projectWorkspaceRepository.saveAndFlush(workspace);
+
+        // Clear the L1 cache so stale deleted-entity references do not conflict
+        // with the new entities about to be inserted with the same IDs.
+        entityManager.clear();
+
+        // Re-fetch workspace (empty collections) and populate with new data
+        ProjectWorkspace fresh = findOrCreateWorkspace(userId, teamId);
+        applyPayload(fresh, payload);
+        return ProjectWorkspace.toDto(projectWorkspaceRepository.save(fresh));
     }
 
     private ProjectWorkspace findOrCreateWorkspace(UUID userId, UUID teamId) {
