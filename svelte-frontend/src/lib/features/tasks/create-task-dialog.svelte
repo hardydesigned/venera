@@ -134,8 +134,8 @@
 			},
 			onSubmit: async ({ value }) => {
 			// Convert datetime-local format to ISO datetime strings
-			const startDateTime = value.startDate ? `${value.startDate}:00` : '';
-			const dueDateTime = value.dueDate ? `${value.dueDate}:00` : '';
+			const startDateTime = value.startDate ? `${value.startDate}:00` : null;
+			const dueDateTime = value.dueDate ? `${value.dueDate}:00` : null;
 
 			const input: CreateTaskInput = {
 				...value,
@@ -216,9 +216,9 @@
 							input: {
 								title: string;
 								description: string;
-								done: boolean;
-								startDate: string;
-								dueDate: string;
+								status: TaskStatus;
+								startDate: string | null;
+								dueDate: string | null;
 							}
 						) => void;
 					}
@@ -227,17 +227,17 @@
 			bridge?.updateCard?.(cardId, {
 				title: editTitle.trim(),
 				description: editDescription.trim(),
-				done: editStatus === 'DONE',
-				startDate: editStartDate ? `${editStartDate}:00` : '',
-				dueDate: editDueDate ? `${editDueDate}:00` : ''
+				status: editStatus,
+				startDate: editStartDate ? `${editStartDate}:00` : null,
+				dueDate: editDueDate ? `${editDueDate}:00` : null
 			});
 			createTaskDialogStore.close();
 			return;
 		}
 
 		// Convert datetime-local format to ISO datetime strings
-		const startDateTime = editStartDate ? `${editStartDate}:00` : '';
-		const dueDateTime = editDueDate ? `${editDueDate}:00` : '';
+		const startDateTime = editStartDate ? `${editStartDate}:00` : null;
+		const dueDateTime = editDueDate ? `${editDueDate}:00` : null;
 
 		const input: UpdateTaskInput = {
 			title: editTitle.trim(),

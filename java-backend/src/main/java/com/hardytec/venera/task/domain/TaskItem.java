@@ -23,9 +23,6 @@ public class TaskItem {
     @Column(nullable = true)
     private UUID teamId;
 
-    @Column(nullable = true)
-    private UUID projectId;
-
     @Column(nullable = false)
     private String title;
 
@@ -100,4 +97,5 @@ public class TaskItem {
         this.estimatedDurationMinutes = estimatedDurationMinutes;
         this.actualDurationMinutes = actualDurationMinutes;
     }
+
 }

@@ -14,6 +14,9 @@ import com.hardytec.venera.team.domain.TeamInvitation;
 import com.hardytec.venera.team.domain.TeamInvitationStatus;
 import com.hardytec.venera.team.domain.TeamMember;
 import com.hardytec.venera.team.domain.TeamRole;
+
+import jakarta.validation.constraints.NotNull;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,6 +83,11 @@ public class TeamService {
 
         Map<UUID, TeamMember> memberByTeamId = memberships.stream()
                 .collect(Collectors.toMap(TeamMember::getTeamId, Function.identity()));
+
+        if (memberByTeamId.isEmpty() || memberByTeamId.keySet() == null) {
+            return List.of();
+        }
+        
         List<Team> teams = teamRepository.findAllById(memberByTeamId.keySet());
 
         return teams.stream()

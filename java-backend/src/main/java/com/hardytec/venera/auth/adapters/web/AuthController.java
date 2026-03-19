@@ -5,7 +5,10 @@ import com.hardytec.venera.auth.configuration.AuthCookieService;
 import com.hardytec.venera.auth.application.JwtService;
 import com.hardytec.venera.auth.application.UserService;
 import com.hardytec.venera.auth.application.RefreshTokenService;
+import com.hardytec.venera.auth.application.ForgotPasswordService;
 import com.hardytec.venera.auth.adapters.persistence.RefreshTokenRepository;
+import com.hardytec.venera.auth.adapters.persistence.ForgotPasswordRepository;
+import com.hardytec.venera.auth.domain.RefreshToken;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import jakarta.validation.Valid;
 import java.util.Map;
@@ -15,6 +18,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,19 +43,28 @@ public class AuthController {
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenService refreshTokenService;
     private final AuthCookieService authCookieService;
+    private final AuthenticationManager authenticationManager;
+    private final ForgotPasswordService forgotPasswordService;
+    private final ForgotPasswordRepository forgotPasswordRepository;
 
     public AuthController(
             JwtService jwtService,
             UserService userService,
             RefreshTokenRepository refreshTokenRepository,
             RefreshTokenService refreshTokenService,
-            AuthCookieService authCookieService
+            AuthCookieService authCookieService,
+            AuthenticationManager authenticationManager,
+            ForgotPasswordService forgotPasswordService,
+            ForgotPasswordRepository forgotPasswordRepository
     ) {
         this.jwtService = jwtService;
         this.userService = userService;
         this.refreshTokenRepository = refreshTokenRepository;
         this.refreshTokenService = refreshTokenService;
         this.authCookieService = authCookieService;
+        this.authenticationManager = authenticationManager;
+        this.forgotPasswordService = forgotPasswordService;
+        this.forgotPasswordRepository = forgotPasswordRepository;
     }
 
     @GetMapping("/csrf")
@@ -70,20 +84,18 @@ public class AuthController {
 
     @PostMapping("/login")
     @RateLimiter(name = "authRateLimit")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        throw new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED, "Password login disabled. Use Google OAuth2.");
-    }
-
-    @PostMapping("/ott/request")
-    @RateLimiter(name = "authRateLimit")
-    public ResponseEntity<Void> requestOttToken(@Valid @RequestBody OttRequest request) {
-        throw new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED, "OTT login disabled. Use Google OAuth2.");
-    }
-
-    @PostMapping("/login/ott")
-    @RateLimiter(name = "authRateLimit")
-    public ResponseEntity<LoginResponse> loginWithOtt(@Valid @RequestBody OttLoginRequest request) {
-        throw new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED, "OTT login disabled. Use Google OAuth2.");
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request,
+                                               HttpServletRequest httpRequest,
+                                               HttpServletResponse httpResponse) {
+        var authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+        String jwt = jwtService.generateToken(principal.getUsername());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(principal.getUser().getId());
+        authCookieService.addAccessTokenCookie(httpRequest, httpResponse, jwt);
+        authCookieService.addRefreshTokenCookie(httpRequest, httpResponse, refreshToken.getToken());
+        UserDto userDto = userService.getById(principal.getUser().getId().toString());
+        return ResponseEntity.ok(new LoginResponse(jwt, refreshToken.getToken(), userDto));
     }
 
     @PostMapping("/logout")
@@ -98,8 +110,16 @@ public class AuthController {
 
     @PostMapping("/signup")
     @RateLimiter(name = "authRateLimit")
-    public ResponseEntity<Void> signUp(@Valid @RequestBody SignUpRequest request) {
-        throw new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED, "Signup disabled. Use Google OAuth2.");
+    public ResponseEntity<LoginResponse> signUp(@Valid @RequestBody SignUpRequest request,
+                                                HttpServletRequest httpRequest,
+                                                HttpServletResponse httpResponse) {
+        UserDto userDto = userService.signUp(request);
+        var userAccount = userService.getEntityByEmail(request.email());
+        String jwt = jwtService.generateToken(userAccount.getEmail());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userAccount.getId());
+        authCookieService.addAccessTokenCookie(httpRequest, httpResponse, jwt);
+        authCookieService.addRefreshTokenCookie(httpRequest, httpResponse, refreshToken.getToken());
+        return ResponseEntity.status(HttpStatus.CREATED).body(new LoginResponse(jwt, refreshToken.getToken(), userDto));
     }
 
     @PostMapping("/refresh")
@@ -127,13 +147,22 @@ public class AuthController {
     @PostMapping("/forgot-password")
     @RateLimiter(name = "authRateLimit")
     public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
-        throw new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED, "Password reset disabled. Use Google OAuth2.");
+        try {
+            forgotPasswordService.sendToken(request.email());
+        } catch (ResponseStatusException e) {
+            // Swallow NOT_FOUND to avoid leaking whether an email exists
+        }
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/reset-password")
     @RateLimiter(name = "authRateLimit")
     public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
-        throw new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED, "Password reset disabled. Use Google OAuth2.");
+        var user = forgotPasswordService.validateToken(request.resetPasswordToken());
+        userService.changePassword(user, request.newPassword());
+        forgotPasswordRepository.findByToken(request.resetPasswordToken())
+                .ifPresent(forgotPasswordRepository::delete);
+        return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<String> rateLimitingFallback(int id, RequestNotPermitted ex) {

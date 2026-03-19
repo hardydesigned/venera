@@ -67,6 +67,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/auth/csrf").permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/auth/login", "/auth/signup",
+                                "/auth/forgot-password", "/auth/reset-password").permitAll()
                         .requestMatchers(
                                 "/oauth2/**",
                                 "/login/oauth2/**")

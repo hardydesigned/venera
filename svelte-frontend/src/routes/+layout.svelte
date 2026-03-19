@@ -18,7 +18,7 @@
 	const queryClient = new QueryClient();
 	let { children } = $props();
 
-	const PUBLIC_PATHS = ['/login', '/auth/callback'];
+	const PUBLIC_PATHS = ['/login', '/auth/callback', '/register', '/forgot-password', '/reset-password'];
 	const isPublicPath = $derived(PUBLIC_PATHS.some((p) => page.url.pathname.startsWith(p)));
 	const isAuthenticated = $derived(!!$authStore.user);
 

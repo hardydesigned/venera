@@ -1,27 +1,27 @@
 package com.hardytec.venera.task.adapters.web.task;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-import jakarta.validation.Valid;
-import java.util.List;
-import java.util.UUID;
-
 import com.hardytec.venera.auth.adapters.web.CurrentUserResolver;
 import com.hardytec.venera.task.application.TaskService;
 import com.hardytec.venera.task.adapters.web.task.dto.TaskDTO;
 import com.hardytec.venera.task.adapters.web.task.dto.CreateTaskDTO;
 import com.hardytec.venera.task.adapters.web.task.dto.UpdateTaskDTO;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/tasks")
@@ -35,7 +35,7 @@ public class TaskController {
         this.taskService = taskService;
         this.currentUserResolver = currentUserResolver;
     }
-    
+
     @PostMapping
     public ResponseEntity<TaskDTO> createTask(
             @Valid @RequestBody CreateTaskDTO createTaskDTO,
@@ -50,14 +50,6 @@ public class TaskController {
             @RequestHeader(value = "X-Team-Id", required = false) String teamHeader) {
         UUID userId = currentUserResolver.getCurrentUserId();
         return ResponseEntity.ok(taskService.getInboxTasks(userId, parseTeamId(teamHeader)));
-    }
-
-    @GetMapping("/project/{projectId}")
-    public ResponseEntity<List<TaskDTO>> getTasksForProject(
-            @PathVariable UUID projectId,
-            @RequestHeader(value = "X-Team-Id", required = false) String teamHeader) {
-        UUID userId = currentUserResolver.getCurrentUserId();
-        return ResponseEntity.ok(taskService.getTasksForProject(userId, projectId, parseTeamId(teamHeader)));
     }
 
     @GetMapping("/{id}")

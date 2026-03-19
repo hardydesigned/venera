@@ -1,0 +1,3 @@
+ALTER TABLE calendar_events DROP COLUMN IF EXISTS project_id;
+ALTER TABLE tasks DROP COLUMN IF EXISTS project_id;
+DROP TABLE IF EXISTS projects;

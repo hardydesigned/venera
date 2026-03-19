@@ -90,12 +90,12 @@
 		newListName = '';
 	}
 
-	function addCard(listId: string) {
+	async function addCard(listId: string) {
 		if (!selectedProject) return;
 		const title = (newCardTitleByList[listId] ?? '').trim();
 		if (!title) return;
-		projectStore.addCard(selectedProject.id, listId, title);
 		newCardTitleByList = { ...newCardTitleByList, [listId]: '' };
+		await projectStore.addCard(selectedProject.id, listId, title);
 	}
 
 	function updateCardInput(listId: string, value: string) {
@@ -175,30 +175,34 @@
 		return null;
 	}
 
+	import type { TaskStatus } from '$lib/features/projects/project-store';
+
 	function updateProjectCard(
 		cardId: string,
 		input: {
 			title: string;
 			description: string;
-			done: boolean;
-			startDate: string;
-			dueDate: string;
+			status: TaskStatus;
+			startDate: string | null;
+			dueDate: string | null;
 		}
 	) {
 		const project = selectedProject;
 		const found = findCardById(cardId);
 		if (!project || !found) return;
 
-		const normalizeToDayStart = (value: string): string => {
-			if (!value) return '';
+		const normalizeToDayStart = (value: string | null): string | null => {
+			if (!value) return null;
 			const date = new Date(value);
-			if (Number.isNaN(date.getTime())) return value;
+			if (Number.isNaN(date.getTime())) return null;
 			const pad = (n: number) => String(n).padStart(2, '0');
 			return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T00:00:00`;
 		};
 
 		projectStore.updateCard(project.id, found.list.id, cardId, {
-			...input,
+			title: input.title,
+			description: input.description,
+			status: input.status,
 			startDate: normalizeToDayStart(input.startDate),
 			dueDate: normalizeToDayStart(input.dueDate)
 		});
@@ -231,10 +235,10 @@
 			id: `project-card-${card.id}`,
 			title: card.title,
 			description: card.description ?? '',
-			startDate: card.startDate || `${today}T00:00:00`,
-			dueDate: card.dueDate || `${today}T00:00:00`,
-			category: 'B',
-			status: card.done ? 'DONE' : 'OPEN',
+			startDate: card.startDate ?? `${today}T00:00:00`,
+			dueDate: card.dueDate ?? `${today}T00:00:00`,
+			category: card.category,
+			status: card.status,
 			estimatedDurationMinutes: null,
 			actualDurationMinutes: null
 		};
@@ -242,13 +246,13 @@
 		createTaskDialogStore.openForEdit(pseudoTask);
 	}
 
-	function createCardFromGantt(preferredListId: string | null, title: string): boolean {
+	async function createCardFromGantt(preferredListId: string | null, title: string): Promise<boolean> {
 		const project = selectedProject;
 		if (!project) return false;
 		const fallbackListId = project.lists[0]?.id;
 		const targetListId = preferredListId ?? fallbackListId;
 		if (!targetListId) return false;
-		const createdCardId = projectStore.addCard(project.id, targetListId, title);
+		const createdCardId = await projectStore.addCard(project.id, targetListId, title);
 		return Boolean(createdCardId);
 	}
 
@@ -270,9 +274,9 @@
 				input: {
 					title: string;
 					description: string;
-					done: boolean;
-					startDate: string;
-					dueDate: string;
+					status: TaskStatus;
+					startDate: string | null;
+					dueDate: string | null;
 				}
 			) => {
 				updateProjectCard(cardId, input);
@@ -386,13 +390,13 @@
 											projectStore.toggleCardDone(selectedProject.id, list.id, card.id);
 										}}
 									>
-										{#if card.done}
+										{#if card.status === 'DONE'}
 											<CircleCheckBig class="size-4" />
 										{:else}
 											<Circle class="size-4" />
 										{/if}
 									</button>
-									<span class="text-sm {card.done ? 'text-muted-foreground line-through' : ''}"
+									<span class="text-sm {card.status === 'DONE' ? 'text-muted-foreground line-through' : ''}"
 										>{card.title}</span
 									>
 								</div>
@@ -463,13 +467,13 @@
 										projectStore.toggleCardDone(selectedProject.id, list.id, card.id);
 									}}
 								>
-									{#if card.done}
+									{#if card.status === 'DONE'}
 										<CircleCheckBig class="size-4" />
 									{:else}
 										<Circle class="size-4" />
 									{/if}
 								</button>
-								<span class="text-sm {card.done ? 'text-muted-foreground line-through' : ''}"
+								<span class="text-sm {card.status === 'DONE' ? 'text-muted-foreground line-through' : ''}"
 									>{card.title}</span
 								>
 							</li>

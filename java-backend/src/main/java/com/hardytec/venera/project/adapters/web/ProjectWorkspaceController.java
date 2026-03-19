@@ -1,7 +1,7 @@
 package com.hardytec.venera.project.adapters.web;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.hardytec.venera.auth.adapters.web.CurrentUserResolver;
+import com.hardytec.venera.project.adapters.web.dto.ProjectWorkspacePayloadDto;
 import com.hardytec.venera.project.application.ProjectWorkspaceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,19 +30,19 @@ public class ProjectWorkspaceController {
     }
 
     @GetMapping
-    public ResponseEntity<JsonNode> getWorkspace(
+    public ResponseEntity<ProjectWorkspacePayloadDto> getWorkspace(
             @RequestHeader(value = "X-Team-Id", required = false) String teamHeader) {
         UUID userId = currentUserResolver.getCurrentUserId();
-        JsonNode workspace = projectWorkspaceService.getWorkspace(userId, parseTeamId(teamHeader));
+        ProjectWorkspacePayloadDto workspace = projectWorkspaceService.getWorkspace(userId, parseTeamId(teamHeader));
         return ResponseEntity.ok(workspace);
     }
 
     @PutMapping
-    public ResponseEntity<JsonNode> saveWorkspace(
-            @RequestBody JsonNode payload,
+    public ResponseEntity<ProjectWorkspacePayloadDto> saveWorkspace(
+            @RequestBody ProjectWorkspacePayloadDto payload,
             @RequestHeader(value = "X-Team-Id", required = false) String teamHeader) {
         UUID userId = currentUserResolver.getCurrentUserId();
-        JsonNode saved = projectWorkspaceService.saveWorkspace(userId, parseTeamId(teamHeader), payload);
+        ProjectWorkspacePayloadDto saved = projectWorkspaceService.saveWorkspace(userId, parseTeamId(teamHeader), payload);
         return ResponseEntity.status(HttpStatus.OK).body(saved);
     }
 

@@ -48,7 +48,7 @@
 		lists: ProjectList[];
 		onOpenCard: (listId: string, card: ProjectTaskCard) => void;
 		onToggleDone: (listId: string, cardId: string) => void;
-		onCreateCard: (listId: string | null, title: string) => boolean;
+		onCreateCard: (listId: string | null, title: string) => Promise<boolean>;
 	}
 
 	const DAY_MS = 24 * 60 * 60 * 1000;
@@ -163,7 +163,7 @@
 		const byId = new Map(cards.map((card) => [card.id, card]));
 		const children = new Map<string | null, ProjectTaskCard[]>();
 		for (const card of cards) {
-			const parentId = card.parentId && byId.has(card.parentId) ? card.parentId : null;
+			const parentId = card.parentTaskId && byId.has(card.parentTaskId) ? card.parentTaskId : null;
 			const existing = children.get(parentId) ?? [];
 			existing.push(card);
 			children.set(parentId, existing);
@@ -218,8 +218,8 @@
 	});
 
 	function passesFilters(row: Row): boolean {
-		if (statusFilter === 'done' && !row.card.done) return false;
-		if (statusFilter === 'open' && row.card.done) return false;
+		if (statusFilter === 'done' && row.card.status !== 'DONE') return false;
+		if (statusFilter === 'open' && row.card.status === 'DONE') return false;
 		if (searchQuery.trim()) {
 			const q = searchQuery.trim().toLowerCase();
 			if (
@@ -236,10 +236,10 @@
 		const list = lists.find((entry) => entry.id === row.listId);
 		if (!list) return false;
 		const byId = new Map(list.cards.map((card) => [card.id, card]));
-		let parent = row.card.parentId;
+		let parent = row.card.parentTaskId;
 		while (parent) {
 			if (collapsed[parent]) return true;
-			parent = byId.get(parent)?.parentId ?? null;
+			parent = byId.get(parent)?.parentTaskId ?? null;
 		}
 		return false;
 	}
@@ -371,7 +371,7 @@
 				const card = byId.get(id);
 				if (!card) return null;
 				if (id === activeDrag.rootId) {
-					return { ...card, order: index, parentId };
+					return { ...card, order: index, parentTaskId: parentId };
 				}
 				return { ...card, order: index };
 			})
@@ -509,10 +509,10 @@
 		}
 	}
 
-	function quickCreateCard() {
+	async function quickCreateCard() {
 		const title = quickCreateTitle.trim();
 		if (!title) return;
-		const created = onCreateCard(selectedListId === 'all' ? null : selectedListId, title);
+		const created = await onCreateCard(selectedListId === 'all' ? null : selectedListId, title);
 		if (created) {
 			quickCreateTitle = '';
 		}
@@ -685,7 +685,7 @@
 										class="text-muted-foreground hover:text-foreground"
 										onclick={() => onToggleDone(row.listId, row.card.id)}
 									>
-										{#if row.card.done}
+										{#if row.card.status === 'DONE'}
 											<CircleCheckBig class="size-4" />
 										{:else}
 											<Circle class="size-4" />
@@ -693,7 +693,7 @@
 									</button>
 									<button
 										type="button"
-										class="min-w-0 truncate text-left {row.card.done
+										class="min-w-0 truncate text-left {row.card.status === 'DONE'
 											? 'text-muted-foreground line-through'
 											: ''}"
 										onclick={() => onOpenCard(row.listId, row.card)}
@@ -758,7 +758,7 @@
 										data-bar
 										role="button"
 										class="absolute top-1.5 h-7 cursor-move rounded-full border px-2 text-xs leading-7 text-amber-950"
-										style={`${barShade(row.level, row.card.done)} left: ${msToPx(range.startMs)}px; width: ${Math.max(
+										style={`${barShade(row.level, row.card.status === 'DONE')} left: ${msToPx(range.startMs)}px; width: ${Math.max(
 											msToPx(getDisplayEndMs(range.endMs)) - msToPx(range.startMs),
 											12
 										)}px;`}

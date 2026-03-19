@@ -46,25 +46,11 @@ public class TaskService {
     public List<TaskDTO> getInboxTasks(UUID userId, UUID teamId) {
         if (teamId != null) {
             teamService.assertTeamMember(teamId, userId);
-            return taskRepository.findByTeamIdAndProjectIdIsNull(teamId).stream()
+            return taskRepository.findByTeamId(teamId).stream()
                     .map(TaskDTO::from)
                     .toList();
         }
-
-        return taskRepository.findByUserIdAndTeamIdIsNullAndProjectIdIsNull(userId).stream()
-                .map(TaskDTO::from)
-                .toList();
-    }
-
-    public List<TaskDTO> getTasksForProject(UUID userId, UUID projectId, UUID teamId) {
-        if (teamId != null) {
-            teamService.assertTeamMember(teamId, userId);
-            return taskRepository.findAllByTeamIdAndProjectId(teamId, projectId).stream()
-                    .map(TaskDTO::from)
-                    .toList();
-        }
-
-        return taskRepository.findAllByUserIdAndTeamIdIsNullAndProjectId(userId, projectId).stream()
+        return taskRepository.findByUserIdAndTeamIdIsNull(userId).stream()
                 .map(TaskDTO::from)
                 .toList();
     }
@@ -104,7 +90,6 @@ public class TaskService {
             }
             return;
         }
-
         if (task.getTeamId() != null || !task.getUserId().equals(userId)) {
             throw new TaskNotFoundException(taskId);
         }

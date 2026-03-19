@@ -1,20 +1,29 @@
 package com.hardytec.venera.project.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-@Data
-@Entity
+import com.hardytec.venera.project.adapters.web.dto.ProjectWorkspacePayloadDto;
+
+@Getter
+@Setter
 @NoArgsConstructor
+@Entity
 @Table(name = "project_workspaces")
 public class ProjectWorkspace {
 
@@ -28,8 +37,13 @@ public class ProjectWorkspace {
     @Column(nullable = true)
     private UUID teamId;
 
-    @Column(nullable = false, columnDefinition = "text")
-    private String payload;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "workspace")
+    @OrderBy("sort_order ASC")
+    private List<WorkspaceProject> projects = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "workspace")
+    @OrderBy("sort_order ASC")
+    private List<WorkspaceFolder> folders = new ArrayList<>();
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
@@ -42,9 +56,6 @@ public class ProjectWorkspace {
         if (id == null) {
             id = UUID.randomUUID();
         }
-        if (payload == null || payload.isBlank()) {
-            payload = "{\"projects\":[],\"folders\":[]}";
-        }
         Instant now = Instant.now();
         createdAt = now;
         updatedAt = now;
@@ -54,4 +65,12 @@ public class ProjectWorkspace {
     public void preUpdate() {
         updatedAt = Instant.now();
     }
+
+    public static ProjectWorkspacePayloadDto toDto(ProjectWorkspace workspace) {
+        ProjectWorkspacePayloadDto dto = new ProjectWorkspacePayloadDto();
+        dto.setFolders(workspace.getFolders().stream().map(WorkspaceFolder::toFolderDto).toList());
+        dto.setProjects(workspace.getProjects().stream().map(WorkspaceProject::toProjectDto).toList());
+        return dto;
+    }
+
 }

@@ -18,3 +18,56 @@ export async function logout(): Promise<void> {
 		throw new Error(`Logout failed: ${res.status}`);
 	}
 }
+
+export async function login(email: string, password: string): Promise<AuthUser> {
+	const res = await apiFetch('/auth/login', {
+		method: 'POST',
+		body: JSON.stringify({ email, password })
+	});
+	if (!res.ok) {
+		const text = await res.text().catch(() => '');
+		throw new Error(text || `Login failed: ${res.status}`);
+	}
+	const data = await res.json();
+	return data.user as AuthUser;
+}
+
+export async function signUp(
+	firstName: string,
+	lastName: string,
+	email: string,
+	password: string,
+	confirmPassword: string
+): Promise<AuthUser> {
+	const res = await apiFetch('/auth/signup', {
+		method: 'POST',
+		body: JSON.stringify({ firstName, lastName, email, password, confirmPassword })
+	});
+	if (!res.ok) {
+		const text = await res.text().catch(() => '');
+		throw new Error(text || `Registrierung fehlgeschlagen: ${res.status}`);
+	}
+	const data = await res.json();
+	return data.user as AuthUser;
+}
+
+export async function forgotPassword(email: string): Promise<void> {
+	const res = await apiFetch('/auth/forgot-password', {
+		method: 'POST',
+		body: JSON.stringify({ email })
+	});
+	if (!res.ok) {
+		throw new Error(`Anfrage fehlgeschlagen: ${res.status}`);
+	}
+}
+
+export async function resetPassword(resetPasswordToken: string, newPassword: string): Promise<void> {
+	const res = await apiFetch('/auth/reset-password', {
+		method: 'POST',
+		body: JSON.stringify({ resetPasswordToken, newPassword })
+	});
+	if (!res.ok) {
+		const text = await res.text().catch(() => '');
+		throw new Error(text || `Passwort-Reset fehlgeschlagen: ${res.status}`);
+	}
+}

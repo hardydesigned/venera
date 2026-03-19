@@ -9,6 +9,10 @@ import {
 	saveProjectWorkspace,
 	type ProjectWorkspacePayload
 } from '$lib/api/project-workspace';
+import { createTask } from '$lib/api/tasks';
+import type { TaskStatus, TaskPriorityCategory } from '$lib/features/tasks/types';
+
+export type { TaskStatus, TaskPriorityCategory };
 
 const BASE_STORAGE_KEY = 'venera_projects';
 
@@ -16,11 +20,12 @@ export interface ProjectTaskCard {
 	id: string;
 	title: string;
 	description: string;
-	done: boolean;
-	parentId: string | null;
+	status: TaskStatus;
+	category: TaskPriorityCategory;
+	parentTaskId: string | null;
 	order: number;
-	startDate: string;
-	dueDate: string;
+	startDate: string | null;
+	dueDate: string | null;
 }
 
 export interface ProjectList {
@@ -67,25 +72,49 @@ function defaultLists(): ProjectList[] {
 
 function normalizeCard(input: unknown, index: number): ProjectTaskCard {
 	const card = (input ?? {}) as Partial<ProjectTaskCard> & {
-		description?: unknown;
+		done?: unknown;
 		parentId?: unknown;
-		order?: unknown;
-		startDate?: unknown;
-		dueDate?: unknown;
 	};
 
-	const parentId =
-		typeof card.parentId === 'string' && card.parentId.trim().length > 0 ? card.parentId : null;
+	// Migrate old parentId field
+	const parentTaskId =
+		typeof card.parentTaskId === 'string' && card.parentTaskId.trim().length > 0
+			? card.parentTaskId
+			: typeof card.parentId === 'string' && card.parentId.trim().length > 0
+				? card.parentId
+				: null;
+
+	// Migrate old done: boolean field
+	const status: TaskStatus =
+		card.status === 'OPEN' ||
+		card.status === 'IN_PROGRESS' ||
+		card.status === 'DONE' ||
+		card.status === 'CANCELLED'
+			? card.status
+			: card.done === true
+				? 'DONE'
+				: 'OPEN';
+
+	const category: TaskPriorityCategory =
+		card.category === 'A' || card.category === 'B' || card.category === 'C'
+			? card.category
+			: 'B';
+
+	const startDate =
+		typeof card.startDate === 'string' && card.startDate.trim() ? card.startDate : null;
+	const dueDate =
+		typeof card.dueDate === 'string' && card.dueDate.trim() ? card.dueDate : null;
 
 	return {
 		id: typeof card.id === 'string' && card.id.trim() ? card.id : uid(),
 		title: typeof card.title === 'string' ? card.title : '',
 		description: typeof card.description === 'string' ? card.description : '',
-		done: Boolean(card.done),
-		parentId,
+		status,
+		category,
+		parentTaskId,
 		order: typeof card.order === 'number' && Number.isFinite(card.order) ? card.order : index,
-		startDate: typeof card.startDate === 'string' ? card.startDate : '',
-		dueDate: typeof card.dueDate === 'string' ? card.dueDate : ''
+		startDate,
+		dueDate
 	};
 }
 
@@ -399,10 +428,26 @@ function createProjectStore() {
 				})
 			}));
 		},
-		addCard(projectId: string, listId: string, title: string): string | null {
+		async addCard(projectId: string, listId: string, title: string): Promise<string | null> {
 			const trimmed = title.trim();
 			if (!trimmed) return null;
-			const cardId = uid();
+
+			let task: Awaited<ReturnType<typeof createTask>>;
+			try {
+				task = await createTask({
+					title: trimmed,
+					description: '',
+					startDate: null,
+					dueDate: null,
+					category: 'B',
+					status: 'OPEN',
+					estimatedDurationMinutes: null,
+					actualDurationMinutes: null
+				});
+			} catch {
+				return null;
+			}
+
 			store.update((state) => ({
 				...state,
 				projects: state.projects.map((project) =>
@@ -416,14 +461,15 @@ function createProjectStore() {
 												cards: [
 													...list.cards,
 													{
-														id: cardId,
-														title: trimmed,
-														description: '',
-														done: false,
-														parentId: null,
+														id: task.id,
+														title: task.title,
+														description: task.description ?? '',
+														status: task.status,
+														category: task.category,
+														parentTaskId: null,
 														order: list.cards.length,
-														startDate: '',
-														dueDate: ''
+														startDate: task.startDate ?? null,
+														dueDate: task.dueDate ?? null
 													}
 												]
 											}
@@ -433,7 +479,8 @@ function createProjectStore() {
 						: project
 				)
 			}));
-			return cardId;
+
+			return task.id;
 		},
 		deleteCardFromList(projectId: string, listId: string, cardId: string) {
 			store.update((state) => ({
@@ -483,7 +530,9 @@ function createProjectStore() {
 										? {
 												...list,
 												cards: list.cards.map((card) =>
-													card.id === cardId ? { ...card, done: !card.done } : card
+													card.id === cardId
+														? { ...card, status: card.status === 'DONE' ? 'OPEN' : 'DONE' }
+														: card
 												)
 											}
 										: list
@@ -500,11 +549,12 @@ function createProjectStore() {
 			input: {
 				title?: string;
 				description?: string;
-				done?: boolean;
-				parentId?: string | null;
+				status?: TaskStatus;
+				category?: TaskPriorityCategory;
+				parentTaskId?: string | null;
 				order?: number;
-				startDate?: string;
-				dueDate?: string;
+				startDate?: string | null;
+				dueDate?: string | null;
 			}
 		) {
 			store.update((state) => ({
@@ -523,12 +573,19 @@ function createProjectStore() {
 																...card,
 																title: input.title?.trim() || card.title,
 																description: input.description?.trim() ?? card.description,
-																done: input.done ?? card.done,
-																parentId:
-																	input.parentId !== undefined ? input.parentId : card.parentId,
+																status: input.status ?? card.status,
+																category: input.category ?? card.category,
+																parentTaskId:
+																	input.parentTaskId !== undefined
+																		? input.parentTaskId
+																		: card.parentTaskId,
 																order: input.order ?? card.order,
-																startDate: input.startDate ?? card.startDate,
-																dueDate: input.dueDate ?? card.dueDate
+																startDate:
+																	input.startDate !== undefined
+																		? input.startDate
+																		: card.startDate,
+																dueDate:
+																	input.dueDate !== undefined ? input.dueDate : card.dueDate
 															}
 														: card
 												)
@@ -571,7 +628,7 @@ function createProjectStore() {
 											...list.cards,
 											{
 												...movedCard!,
-												parentId: null,
+												parentTaskId: null,
 												order: list.cards.length
 											}
 										]
