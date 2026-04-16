@@ -1,14 +1,14 @@
-# SentryCommand - Project Structure and Development Guidelines
+# Venera - Project Structure and Development Guidelines
 
 ## Project Overview
 
-SentryCommand is a Next.js application for drone fleet management with:
+Venera ist eine persönliche Produktivitäts- und Projektmanagement-App mit:
 
-- **Frontend**: Next.js 16 (App Router) with React 19
+- **Frontend**: Next.js 15 (App Router) with React 19
 - **Backend**: Convex (Realtime Database & Backend)
-- **Authentication**: Clerk (with Organization Support)
-- **Validation**: Zod + convex-helpers/zod4
-- **UI**: Shadcn/UI + Tailwind CSS
+- **Authentication**: Convex Auth (@convex-dev/auth) — kein externer Auth-Service
+- **Validation**: Zod + convex-helpers
+- **UI**: Shadcn/UI + Tailwind CSS v4
 - **Forms**: React Hook Form with Zod Resolver
 
 Always use Context7 MCP when I need library/API documentation, code generation,
@@ -101,7 +101,7 @@ export const defaultEntity: Partial<CreateEntity> = {
 
 ```typescript
 import { mutation } from "../../_generated/server";
-import { requireOrgIdentity } from "../../lib/auth";
+import { requireAuth } from "../../lib/auth";
 import { createEntitySchema } from "../_model/entity";
 import { zCustomMutation, zid } from "convex-helpers/server/zod4";
 import { NoOp } from "convex-helpers/server/customFunctions";
@@ -204,7 +204,7 @@ URLs.
 ```typescript
 import { query } from "../../_generated/server";
 import { v } from "convex/values";
-import { requireOrgIdentity } from "../../lib/auth";
+import { requireAuth } from "../../lib/auth";
 
 // LIST - All entities of an organization
 export const list = query({
@@ -938,12 +938,12 @@ When a new data structure (e.g., "Mission") should be added to the project:
 
 #### Backend (Convex)
 
-- ✅ **Always** use `requireOrgIdentity()` in mutations/queries
+- ✅ **Always** use `requireAuth()` in mutations/queries
 - ✅ **Always** check org_id on updates/deletes
 - ✅ **Cascade deletes** for dependent resources
 - ✅ **Storage cleanup** on deletes
 - ✅ **zCustomMutation** instead of plain `mutation()`
-- ❌ **No direct ctx.auth** usage without requireOrgIdentity
+- ❌ **No direct ctx.auth** usage without requireAuth
 
 #### Frontend (Next.js)
 
@@ -1028,7 +1028,7 @@ Füge an geeigneten Stellen auch Test Ids hinzu.
 
 ### 7. Security
 
-- ✅ **Always** check authentication (requireOrgIdentity)
+- ✅ **Always** check authentication (requireAuth)
 - ✅ **Always** check authorization (org_id matching)
 - ✅ **Always** validate input (Zod)
 - ✅ **Sensitive data** never store in client
@@ -1044,7 +1044,7 @@ Füge an geeigneten Stellen auch Test Ids hinzu.
 	"next": "^16.0.10",
 	"react": "^19.2.3",
 	"convex": "^1.31.6",
-	"@clerk/nextjs": "^6.36.10",
+	"@convex-dev/auth": "^0.0.87",
 	"zod": "^4.1.13",
 	"convex-helpers": "^0.1.111",
 	"react-hook-form": "^7.68.0",
@@ -1096,7 +1096,7 @@ pnpm dev
 
 - **Convex**: Console in Dev Dashboard
 - **Next.js**: Terminal + Browser Console
-- **Clerk**: [clerk.com/dashboard](https://clerk.com/dashboard)
+- **Convex Auth**: Convex Dashboard → Auth-Einstellungen
 
 ## Common Issues
 

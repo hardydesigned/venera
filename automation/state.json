@@ -1,0 +1,8 @@
+{
+  "last_agent_used": "FEATURE_AGENT",
+  "next_agent": "FEATURE_AGENT",
+  "last_run_timestamp": "2026-04-16T00:00:00Z",
+  "last_task_id": "AUFG-001-next-convex-foundation",
+  "run_count": 1,
+  "notes": "AUFG-001 in Bearbeitung - Foundation angelegt, pnpm install + convex dev noch ausstehend. Weiterhin FEATURE_AGENT da offene Aufgaben vorhanden."
+}
