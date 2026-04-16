@@ -20,7 +20,10 @@
 
 ## Next.js / Convex Funktionen (werden laufend ergänzt)
 
-### Auth (`convex/lib/auth.ts`)
-- `requireOrgIdentity(identity)` - Pflicht-Auth-Check, gibt `{ userId, orgId }` zurück
+### Auth (`nextjs-app/convex/lib/auth.ts`)
+- `requireAuth(identity)` - Pflicht-Auth-Check ohne Org, gibt `{ userId }` zurück
+- `requireOrgIdentity(identity)` - Pflicht-Auth-Check mit Org, gibt `{ userId, orgId }` zurück
 
-*(weitere werden bei Implementierung hinzugefügt)*
+### Tasks Hooks (`nextjs-app/app/(protected)/inbox/_controller/useTasks.ts`)
+- `useTasks()` – Hook für vollständige Task-Liste + CRUD. Gibt `{ tasks, isLoading, create, update, remove }` zurück
+- `useInboxTasks()` – Hook für Inbox (nur Tasks ohne Datum + nicht abgeschlossen)

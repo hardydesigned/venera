@@ -1,9 +1,9 @@
 {
-  "last_agent_used": null,
+  "last_agent_used": "FEATURE_AGENT",
   "next_agent": "FEATURE_AGENT",
-  "last_run_timestamp": null,
-  "last_task_id": null,
-  "run_count": 0,
+  "last_run_timestamp": "2026-04-16T00:00:00.000Z",
+  "last_task_id": "T01",
+  "run_count": 1,
   "rotation": ["FEATURE_AGENT", "SECURITY_AGENT", "TEST_AGENT", "MAINTENANCE_AGENT"],
-  "notes": "Erster Lauf - Automation-Infrastruktur angelegt"
+  "notes": "T01 zu 90% abgeschlossen. T02 zu 80%, T03 zu 60%. Nächster Lauf: T03 vervollständigen (Edit-Dialog), dann T04 (Calendar)"
 }

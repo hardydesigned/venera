@@ -29,5 +29,16 @@
 - [Tasks-Modul](./memories/tasks-modul.md) - Details zum Task-Datenmodell
 - [Auth-Architektur](./memories/auth-architektur.md) - Convex Auth Details
 
+## Kritische Hinweise
+- **nextjs-app/.git Problem**: `pnpm create next-app` hat ein eigenes `.git` erstellt. User muss `rm -rf nextjs-app/.git` ausführen, damit die Dateien im Haupt-Repo getracked werden. Bis dahin ist nextjs-app als "Submodul" registriert.
+- **Convex Setup**: Vor dem Start muss `npx convex dev` in `nextjs-app/` ausgeführt werden. Das generiert `convex/_generated/` und verknüpft das Convex-Projekt.
+- **ConvexClientProvider**: Verwendet Placeholder-URL für Build ohne env. Im echten Betrieb muss `NEXT_PUBLIC_CONVEX_URL` gesetzt sein.
+
 ## Letzte Runs
-- **Run 1** (2026-04-16): Automation-Infrastruktur angelegt, Aufgaben aus NUTZER_ÄNDERUNGEN.md erstellt, Next.js App Scaffolding begonnen
+- **Run 1** (2026-04-16): 
+  - Automation-Infrastruktur angelegt (Aufgabe.md, state.json, log.md, memory.md, type_index.md, function_index.md)
+  - nextjs-app/ erstellt: Next.js 16 + Convex + Convex Auth + Shadcn/UI
+  - Auth-Seiten: Login, Register, Forgot-Password
+  - Inbox-Seite mit Task-CRUD implementiert
+  - Build erfolgreich (pnpm build bestanden)
+  - CLAUDE.md auf Convex Auth aktualisiert

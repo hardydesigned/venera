@@ -3,32 +3,38 @@
 ## Offene Aufgaben
 
 ### [feature] T01: Next.js App mit Convex + Convex Auth aufsetzen
-**Priorität:** Hoch | **Status:** Offen
+**Priorität:** Hoch | **Status:** In Arbeit (90% fertig)
 Initialisierung der neuen Next.js 16 App (App Router) als Ersatz für svelte-frontend + java-backend.
-- [ ] `nextjs-app/` Verzeichnis anlegen und Next.js 16 scaffolden
-- [ ] Convex einrichten (`convex/` Verzeichnis, schema.ts, lib/auth.ts)
-- [ ] `@convex-dev/auth` installieren und konfigurieren (ersetzt Clerk)
-- [ ] Tailwind 4 + Shadcn/UI einrichten
-- [ ] Basis-Layout mit Sidebar/Navigation erstellen
-- [ ] Protected Route Layout (`(protected)/layout.tsx`)
-- [ ] AGENTS.md / CLAUDE.md auf Convex Auth anpassen (Clerk entfernen)
+- [x] `nextjs-app/` Verzeichnis anlegen und Next.js 16 scaffolden
+- [x] Convex einrichten (`convex/` Verzeichnis, schema.ts, lib/auth.ts)
+- [x] `@convex-dev/auth` installieren und konfigurieren (ersetzt Clerk)
+- [x] Tailwind 4 + Shadcn/UI einrichten
+- [x] Basis-Layout mit Sidebar/Navigation erstellen
+- [x] Protected Route Layout (`(protected)/layout.tsx`)
+- [x] AGENTS.md / CLAUDE.md auf Convex Auth anpassen (Clerk entfernen)
+- [ ] **WICHTIG**: `rm -rf nextjs-app/.git` ausführen damit nextjs-app als reguläre Dateien im Repo ist
+- [ ] `npx convex dev` ausführen um _generated/ Typen zu generieren und Convex-Projekt zu verknüpfen
 
 ### [feature] T02: Auth-Seiten migrieren (Login, Register, Passwort vergessen)
-**Priorität:** Hoch | **Status:** Offen | **Abhängig von:** T01
-- [ ] Login-Seite (`/login`)
-- [ ] Register-Seite (`/register`)
-- [ ] Forgot-Password-Seite (`/forgot-password`)
-- [ ] Auth-Callback-Handling
-- [ ] Convex Auth Backend: Passwort-basierte Authentifizierung
+**Priorität:** Hoch | **Status:** In Arbeit (80% fertig) | **Abhängig von:** T01
+- [x] Login-Seite (`/login`)
+- [x] Register-Seite (`/register`)
+- [x] Forgot-Password-Seite (`/forgot-password`)
+- [x] Auth-Callback-Handling (API-Route `/api/auth/[...convexauth]`)
+- [ ] Convex Auth Backend: Passwort-basierte Authentifizierung (braucht `npx convex dev`)
+- [ ] Passwort-Reset-Flow vollständig implementieren
 
 ### [feature] T03: Tasks-Modul migrieren (Convex Backend + Next.js Frontend)
-**Priorität:** Hoch | **Status:** Offen | **Abhängig von:** T01
-- [ ] Convex Schema: `tasks` Tabelle
-- [ ] Convex Mutations: create, update, remove
-- [ ] Convex Queries: list, get, listInbox
-- [ ] Frontend Hook: `useTasks.ts`
-- [ ] Komponenten: TaskList, TaskForm, DeleteConfirmDialog
-- [ ] Seiten: Inbox (`/inbox`), Task-Detail, New Task
+**Priorität:** Hoch | **Status:** In Arbeit (60% fertig) | **Abhängig von:** T01
+- [x] Convex Schema: `tasks` Tabelle
+- [x] Convex Mutations: create, update, remove
+- [x] Convex Queries: list, get, listInbox
+- [x] Frontend Hook: `useTasks.ts`
+- [x] Komponenten: TaskCard, CreateTaskDialog
+- [x] Seite: Inbox (`/inbox`)
+- [ ] Task-Edit-Dialog implementieren
+- [ ] Task-Detail-Seite
+- [ ] Batch-Create für wiederkehrende Aufgaben
 
 ### [feature] T04: Calendar-Modul migrieren
 **Priorität:** Mittel | **Status:** Offen | **Abhängig von:** T03

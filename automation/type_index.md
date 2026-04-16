@@ -19,6 +19,15 @@
 
 ---
 
-## Next.js / Convex Types (werden laufend ergänzt)
+## Next.js / Convex Types (`nextjs-app/`)
 
-*(noch keine - werden bei Implementierung hinzugefügt)*
+### Tasks (`convex/tasks/_model/task.ts`)
+- `TaskStatus`: `z.enum(["OPEN", "IN_PROGRESS", "DONE", "CANCELLED"])`
+- `TaskCategory`: `z.enum(["A", "B", "C"])`
+- `Task`: `Doc<"tasks">` – mit allen task-Feldern (userId, title, description, startDate, dueDate, category, status, etc.)
+- `CreateTask`: `z.infer<typeof createTaskSchema>` – ohne _id, _creationTime
+- `TaskFormData`: Partielle Form-Version von CreateTask
+- `defaultTask`: Partial<CreateTask> – Default-Werte für Formulare
+
+### Auth (`convex/lib/auth.ts`)
+- `AuthIdentity`: `{ userId: string; orgId?: string }` – Rückgabe von requireAuth()
