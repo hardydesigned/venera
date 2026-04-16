@@ -1,12 +1,12 @@
-# SentryCommand - Project Structure and Development Guidelines
+# Venera - Project Structure and Development Guidelines
 
 ## Project Overview
 
-SentryCommand is a Next.js application for drone fleet management with:
+Venera ist eine persönliche Produktivitäts- und Team-Plattform mit:
 
-- **Frontend**: Next.js 16 (App Router) with React 19
+- **Frontend**: Next.js 16 (App Router) with React 19 → `nextjs-app/`
 - **Backend**: Convex (Realtime Database & Backend)
-- **Authentication**: Clerk (with Organization Support)
+- **Authentication**: Convex Auth (`@convex-dev/auth`) – kein Clerk!
 - **Validation**: Zod + convex-helpers/zod4
 - **UI**: Shadcn/UI + Tailwind CSS
 - **Forms**: React Hook Form with Zod Resolver
@@ -1096,15 +1096,15 @@ pnpm dev
 
 - **Convex**: Console in Dev Dashboard
 - **Next.js**: Terminal + Browser Console
-- **Clerk**: [clerk.com/dashboard](https://clerk.com/dashboard)
+- **Convex Auth**: Convex Dev Dashboard → Functions → auth
 
 ## Common Issues
 
-### "No active organization in session"
+### "Nicht authentifiziert" in Session
 
-- Make sure Clerk organization support is active
-- User must be assigned to an organization
-- Check Clerk JWT template for `org_id` claim
+- `@convex-dev/auth` konfiguriert? → `convex/auth.config.ts` prüfen
+- Middleware korrekt? → `middleware.ts` prüfen
+- Env-Vars gesetzt? → `JWKS`, `JWT_PRIVATE_KEY`, `SITE_URL`
 
 ### "Entity not found"
 

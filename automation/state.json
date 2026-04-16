@@ -1,0 +1,9 @@
+{
+  "last_agent_used": null,
+  "next_agent": "FEATURE_AGENT",
+  "last_run_timestamp": null,
+  "last_task_id": null,
+  "run_count": 0,
+  "rotation": ["FEATURE_AGENT", "SECURITY_AGENT", "TEST_AGENT", "MAINTENANCE_AGENT"],
+  "notes": "Erster Lauf - Automation-Infrastruktur angelegt"
+}
