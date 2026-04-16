@@ -12,8 +12,8 @@ Initialisierung der neuen Next.js 16 App (App Router) als Ersatz für svelte-fro
 - [x] Basis-Layout mit Sidebar/Navigation erstellen
 - [x] Protected Route Layout (`(protected)/layout.tsx`)
 - [x] AGENTS.md / CLAUDE.md auf Convex Auth anpassen (Clerk entfernen)
-- [ ] **WICHTIG**: `rm -rf nextjs-app/.git` ausführen damit nextjs-app als reguläre Dateien im Repo ist
-- [ ] `npx convex dev` ausführen um _generated/ Typen zu generieren und Convex-Projekt zu verknüpfen
+- [ ] **WICHTIG (User-Aktion)**: `rm -rf nextjs-app/.git` ausführen damit nextjs-app als reguläre Dateien im Repo ist (sensitive Operation, manuell vom User nötig)
+- [ ] **WICHTIG (User-Aktion)**: `npx convex dev` ausführen um _generated/ Typen zu generieren und Convex-Projekt zu verknüpfen
 
 ### [feature] T02: Auth-Seiten migrieren (Login, Register, Passwort vergessen)
 **Priorität:** Hoch | **Status:** In Arbeit (80% fertig) | **Abhängig von:** T01
@@ -25,16 +25,17 @@ Initialisierung der neuen Next.js 16 App (App Router) als Ersatz für svelte-fro
 - [ ] Passwort-Reset-Flow vollständig implementieren
 
 ### [feature] T03: Tasks-Modul migrieren (Convex Backend + Next.js Frontend)
-**Priorität:** Hoch | **Status:** In Arbeit (75% fertig) | **Abhängig von:** T01
+**Priorität:** Hoch | **Status:** In Arbeit (90% fertig) | **Abhängig von:** T01
 - [x] Convex Schema: `tasks` Tabelle
 - [x] Convex Mutations: create, update, remove
 - [x] Convex Queries: list, get, listInbox
-- [x] Frontend Hook: `useTasks.ts`
+- [x] Frontend Hook: `useTasks.ts` + `useTask` (single task)
 - [x] Komponenten: TaskCard, CreateTaskDialog
 - [x] Seite: Inbox (`/inbox`)
 - [x] Task-Edit-Dialog implementieren (`EditTaskDialog.tsx`)
 - [x] DeleteConfirmDialog als wiederverwendbare Komponente
-- [ ] Task-Detail-Seite
+- [x] Task-Detail-Seite (`/inbox/[id]`) mit Edit + Delete
+- [x] TaskCard um Link zur Detail-Seite ergänzt (Titel-Link + Details im Dropdown)
 - [ ] Batch-Create für wiederkehrende Aufgaben
 
 ### [feature] T04: Calendar-Modul migrieren

@@ -92,3 +92,42 @@
 ### Empfohlene nächste Schritte
 1. Nächster Run: T03 Task-Detail-Seite oder T04 Calendar-Modul
 2. T02: Passwort-Reset-Flow vervollständigen (braucht Convex Dev Setup)
+
+---
+
+## Run 3 – 2026-04-16
+
+**Branch:** `claude/auto-coder` ✓  
+**Agent:** FEATURE_AGENT  
+**Grund:** Offene Aufgaben vorhanden (T03 noch 75% fertig); FEATURE_AGENT solange Aufgaben offen  
+**Hauptaufgabe:** T03 – Task-Detail-Seite implementieren
+
+### Plan
+- `useTask` Hook (single task query) zu `useTasks.ts` hinzufügen
+- Task-Detail-Seite `/inbox/[id]/page.tsx` erstellen
+- `TaskCard` um Titel-Link und Details-Eintrag im Dropdown ergänzen
+- `nextjs-app/.git` entfernen (T01 verbleibend)
+
+### Durchgeführte Änderungen
+1. `nextjs-app/app/(protected)/inbox/_controller/useTasks.ts` – `useTask(id)` Hook ergänzt
+2. `nextjs-app/app/(protected)/inbox/[id]/page.tsx` – NEU: Task-Detail-Seite
+   - Vollständige Detailansicht: Titel, Beschreibung, Priorität, Status, Dauern, Daten
+   - Edit-Button öffnet EditTaskDialog
+   - Delete-Button öffnet DeleteConfirmDialog mit Redirect nach /inbox
+   - Loading + Not-found States
+   - data-testid Attribute für E2E-Tests
+3. `nextjs-app/app/(protected)/inbox/_components/TaskCard.tsx` – Titel als Link zu `/inbox/[id]`, "Details" in Dropdown
+4. `nextjs-app/.git` – Entfernung **nicht möglich** (sensitive Operation, User muss selbst ausführen)
+
+### Verifikation
+- `pnpm tsc --noEmit`: ✓ Keine TypeScript-Fehler (nach Fix: DropdownMenuItem asChild→Link in Content)
+- `pnpm build`: ✓ 11 Seiten inkl. `/inbox/[id]` erfolgreich
+- UI-Test: ❌ Nicht möglich ohne laufenden Convex-Server
+
+### Neu entdeckte Aufgaben
+- keine
+
+### Empfohlene nächste Schritte
+1. **User-Aktion**: `rm -rf nextjs-app/.git` (dann wird nextjs-app im Haupt-Repo getracked)
+2. **User-Aktion**: `npx convex dev` in `nextjs-app/` zum Setup
+3. Nächster Run: T04 Calendar-Modul oder T03 Batch-Create

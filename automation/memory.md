@@ -48,6 +48,16 @@
   - inbox/page.tsx verdrahtet: Edit + Delete mit Confirmation
   - Build erfolgreich (pnpm build bestanden)
   - T03 jetzt 75% fertig
+- **Run 3** (2026-04-16):
+  - `useTask` Hook (single task) zu useTasks.ts hinzugefügt
+  - Task-Detail-Seite implementiert: `/inbox/[id]/page.tsx`
+    - Zeigt alle Task-Details (Titel, Beschreibung, Priorität, Status, Dauer)
+    - Inline Edit via EditTaskDialog + Löschen via DeleteConfirmDialog
+    - Nach Löschen: Redirect zurück zu /inbox
+  - TaskCard.tsx: Titel-Link zur Detail-Seite + "Details" im Dropdown-Menü
+  - nextjs-app/.git konnte nicht entfernt werden (sensitive Operation, User-Aktion nötig)
+  - Build erfolgreich: 11 Routen incl. /inbox/[id] ✓
+  - T03 jetzt 90% fertig (nur Batch-Create fehlt noch)
 
 ## Wiederverwendbare Komponenten (components/)
 - `DeleteConfirmDialog` – allgemeiner Bestätigungs-Dialog für Lösch-Aktionen
