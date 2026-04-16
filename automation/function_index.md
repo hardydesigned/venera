@@ -27,3 +27,11 @@
 ### Tasks Hooks (`nextjs-app/app/(protected)/inbox/_controller/useTasks.ts`)
 - `useTasks()` – Hook für vollständige Task-Liste + CRUD. Gibt `{ tasks, isLoading, create, update, remove }` zurück
 - `useInboxTasks()` – Hook für Inbox (nur Tasks ohne Datum + nicht abgeschlossen)
+
+### Shared Components (`nextjs-app/components/`)
+- `DeleteConfirmDialog` – Wiederverwendbarer Bestätigungs-Dialog. Props: `open, onOpenChange, onConfirm, title?, description?`
+
+### Task Dialogs (`nextjs-app/app/(protected)/inbox/_components/`)
+- `CreateTaskDialog` – Neuen Task anlegen
+- `EditTaskDialog` – Bestehenden Task bearbeiten (vorausgefüllt via task-Prop + useEffect)
+- `TaskCard` – Task-Karte mit Complete/Edit/Delete-Aktionen

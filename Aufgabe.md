@@ -25,14 +25,15 @@ Initialisierung der neuen Next.js 16 App (App Router) als Ersatz für svelte-fro
 - [ ] Passwort-Reset-Flow vollständig implementieren
 
 ### [feature] T03: Tasks-Modul migrieren (Convex Backend + Next.js Frontend)
-**Priorität:** Hoch | **Status:** In Arbeit (60% fertig) | **Abhängig von:** T01
+**Priorität:** Hoch | **Status:** In Arbeit (75% fertig) | **Abhängig von:** T01
 - [x] Convex Schema: `tasks` Tabelle
 - [x] Convex Mutations: create, update, remove
 - [x] Convex Queries: list, get, listInbox
 - [x] Frontend Hook: `useTasks.ts`
 - [x] Komponenten: TaskCard, CreateTaskDialog
 - [x] Seite: Inbox (`/inbox`)
-- [ ] Task-Edit-Dialog implementieren
+- [x] Task-Edit-Dialog implementieren (`EditTaskDialog.tsx`)
+- [x] DeleteConfirmDialog als wiederverwendbare Komponente
 - [ ] Task-Detail-Seite
 - [ ] Batch-Create für wiederkehrende Aufgaben
 

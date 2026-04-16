@@ -53,3 +53,42 @@
 1. **User-Aktion**: `rm -rf nextjs-app/.git && npx convex dev`
 2. Nächster Run: T03 vervollständigen (Edit-Dialog, Task-Detail)
 3. Dann T04: Calendar-Modul
+
+---
+
+## Run 2 – 2026-04-16
+
+**Branch:** `claude/auto-coder` ✓
+**Agent:** FEATURE_AGENT
+**Grund:** Offene Aufgabe T03 (Tasks-Modul) – Edit-Dialog fehlte noch
+**Hauptaufgabe:** T03 – Task-Edit-Dialog + DeleteConfirmDialog implementieren
+
+### Plan
+- `EditTaskDialog.tsx` erstellen (vorausgefüllter Dialog mit allen Feldern)
+- `DeleteConfirmDialog.tsx` als wiederverwendbare Komponente
+- `inbox/page.tsx` mit beiden Dialogen verdrahten (State, Handler)
+
+### Durchgeführte Änderungen
+1. `nextjs-app/app/(protected)/inbox/_components/EditTaskDialog.tsx` – NEU
+   - Vorausgefüllter Dialog: title, description, category, status, estimatedDurationMinutes
+   - useEffect zum Befüllen bei task-Änderung
+   - data-testid Attribute für E2E-Tests
+2. `nextjs-app/components/DeleteConfirmDialog.tsx` – NEU
+   - Wiederverwendbarer Bestätigungs-Dialog
+   - Props: open, onOpenChange, onConfirm, title, description
+3. `nextjs-app/app/(protected)/inbox/page.tsx` – AKTUALISIERT
+   - handleEdit öffnet EditTaskDialog mit gewählter Aufgabe
+   - handleDeleteConfirm nutzt DeleteConfirmDialog statt direktem Löschen
+   - State: editTask, isEditOpen, isEditSubmitting, deleteId
+
+### Verifikation
+- `pnpm tsc --noEmit`: ✓ Keine TypeScript-Fehler
+- `pnpm build`: ✓ Build erfolgreich (11 Seiten)
+- UI-Test: ❌ Nicht möglich ohne laufenden Convex-Server
+
+### Neu entdeckte Aufgaben
+- keine
+
+### Empfohlene nächste Schritte
+1. Nächster Run: T03 Task-Detail-Seite oder T04 Calendar-Modul
+2. T02: Passwort-Reset-Flow vervollständigen (braucht Convex Dev Setup)

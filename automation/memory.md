@@ -42,3 +42,12 @@
   - Inbox-Seite mit Task-CRUD implementiert
   - Build erfolgreich (pnpm build bestanden)
   - CLAUDE.md auf Convex Auth aktualisiert
+- **Run 2** (2026-04-16):
+  - EditTaskDialog.tsx: vorausgefüllter Edit-Dialog für Tasks (alle Felder)
+  - DeleteConfirmDialog.tsx: wiederverwendbarer Bestätigungs-Dialog (components/)
+  - inbox/page.tsx verdrahtet: Edit + Delete mit Confirmation
+  - Build erfolgreich (pnpm build bestanden)
+  - T03 jetzt 75% fertig
+
+## Wiederverwendbare Komponenten (components/)
+- `DeleteConfirmDialog` – allgemeiner Bestätigungs-Dialog für Lösch-Aktionen
