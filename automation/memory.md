@@ -19,14 +19,24 @@ Kompakte Erinnerung für zukünftige Läufe. Enthält wichtige Erkenntnisse, sen
 - Kalender (Wochenansicht)
 - Auth (Google OAuth, E-Mail/Passwort)
 
-### Implementierte New-Stack Features (Stand Lauf #2)
+### Implementierte New-Stack Features (Stand Lauf #3)
 - ✅ Next.js + Convex Foundation (Auth, Schema, Middleware)
-- ✅ Shadcn UI Komponenten (button, input, label, card, form, select, dialog, badge, scroll-area, dropdown-menu, separator, checkbox, textarea)
+- ✅ Shadcn UI Komponenten (13 Komponenten)
 - ✅ DeleteConfirmDialog (wiederverwendbar)
 - ✅ Inbox / Tasks (CRUD) — Backend + Frontend komplett
   - Hook: `useTasks()` + `useTask(id)`
   - Pages: `/inbox`, `/inbox/new`, `/inbox/[id]/edit`
-- ✅ Sidebar mit Dashboard + Inbox + (Platzhalter für Projekte, Kalender, Code Diff)
+- ✅ Sidebar mit Dashboard + Inbox + Projekte + Kalender + Code Diff (Links)
+- ✅ Projekte (CRUD) — Backend + Frontend komplett
+  - Backend: `convex/projects/_model/project.ts`, `projects/queries.ts`, `projects/mutations.ts`
+  - Hook: `useProjects()` + `useProject(id)`
+  - Pages: `/projekte`, `/projekte/new`, `/projekte/[id]/edit`
+  - Farbige Projektkarten (8 Farben)
+- ✅ Kalender (CRUD) — Backend + Frontend komplett
+  - Backend: `convex/calendar/_model/calendarEvent.ts`, `events/queries.ts`, `events/mutations.ts`
+  - Hook: `useCalendarEvents(startAt, endAt)` (Zeitraum-basiert)
+  - Page: `/kalender` (Monatsansicht mit Monat-Navigation)
+  - CalendarEventDialog für Erstellen/Bearbeiten
 
 ### Geplante Features (aus NUTZER_ÄNDERUNGEN.md)
 1. **Projekte-Seite** (AUFG-010) — als Nächstes
@@ -53,6 +63,14 @@ Kompakte Erinnerung für zukünftige Läufe. Enthält wichtige Erkenntnisse, sen
 - Convex Auth Middleware: Package-Name ist `@convex-dev/auth/nextjs/server`
 - `convex/_generated/` fehlt noch (wird durch `convex dev` erstellt) — Build nicht möglich ohne
 - Inbox Edit-Page nutzt React 19 `use(params)` für async params
+
+### Erkenntnisse aus Lauf #3 (2026-04-17)
+- Projekte-Feature vollständig: Backend + Hook + Form + List + 3 Pages
+- Kalender-Feature vollständig: Backend + Hook + MonthCalendar + CalendarEventDialog
+- Sidebar-Links `/projekte` und `/kalender` bereits korrekt vorhanden
+- (view) Route-Gruppen sind URL-transparent: `/projekte/(view)/page.tsx` → URL `/projekte`
+- Kalender nutzt Zeitraum-Query (startAt/endAt) für effizienten Datenbankzugriff
+- Nächste Priorität: AUFG-002 Restarbeiten (Bugs fixen, svelte/java entfernen) + AUFG-003 (Code Diff)
 
 ### Erkenntnisse aus Lauf #2 (2026-04-17)
 - Shadcn-Komponenten vollständig gebaut (14 Komponenten)

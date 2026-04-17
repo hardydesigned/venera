@@ -38,6 +38,49 @@ Bevor eine neue Funktion implementiert wird, bitte hier nachschauen!
 | `update` | api.tasks.tasks.mutations.update | Task aktualisieren |
 | `remove` | api.tasks.tasks.mutations.remove | Task löschen |
 
+## Hooks — Projekte
+
+| Hook | Datei | Beschreibung |
+|------|-------|-------------|
+| `useProjects()` | app/(protected)/projekte/_controller/useProjects.ts | Projekte laden + CRUD |
+| `useProject(id)` | app/(protected)/projekte/_controller/useProjects.ts | Einzelnes Projekt per ID |
+
+## Hooks — Kalender
+
+| Hook | Datei | Beschreibung |
+|------|-------|-------------|
+| `useCalendarEvents(startAt, endAt)` | app/(protected)/kalender/_controller/useCalendarEvents.ts | Events in Zeitraum + CRUD |
+
+## Convex Queries — Projekte
+
+| Funktion | API-Pfad | Beschreibung |
+|----------|----------|-------------|
+| `listPersonal` | api.projects.projects.queries.listPersonal | Persönliche Projekte des Users |
+| `get` | api.projects.projects.queries.get | Einzelnes Projekt per ID |
+
+## Convex Mutations — Projekte
+
+| Funktion | API-Pfad | Beschreibung |
+|----------|----------|-------------|
+| `create` | api.projects.projects.mutations.create | Projekt erstellen |
+| `update` | api.projects.projects.mutations.update | Projekt aktualisieren |
+| `remove` | api.projects.projects.mutations.remove | Projekt löschen (Tasks entkoppeln) |
+
+## Convex Queries — Kalender
+
+| Funktion | API-Pfad | Beschreibung |
+|----------|----------|-------------|
+| `listByRange` | api.calendar.events.queries.listByRange | Events in Zeitraum (startAt/endAt) |
+| `get` | api.calendar.events.queries.get | Einzelnes Event per ID |
+
+## Convex Mutations — Kalender
+
+| Funktion | API-Pfad | Beschreibung |
+|----------|----------|-------------|
+| `create` | api.calendar.events.mutations.create | Event erstellen |
+| `update` | api.calendar.events.mutations.update | Event aktualisieren |
+| `remove` | api.calendar.events.mutations.remove | Event löschen |
+
 ## Komponenten
 
 | Komponente | Datei | Beschreibung |
@@ -45,3 +88,7 @@ Bevor eine neue Funktion implementiert wird, bitte hier nachschauen!
 | `DeleteConfirmDialog` | components/DeleteConfirmDialog.tsx | Wiederverwendbarer Lösch-Bestätigungs-Dialog |
 | `TaskList` | app/(protected)/inbox/(view)/_components/TaskList.tsx | Aufgaben-Liste mit Dropdown-Menü |
 | `TaskForm` | app/(protected)/inbox/(view)/_components/TaskForm.tsx | Formular für Erstellen/Bearbeiten |
+| `ProjectList` | app/(protected)/projekte/(view)/_components/ProjectList.tsx | Projektkarten-Raster mit Farbstreifen |
+| `ProjectForm` | app/(protected)/projekte/(view)/_components/ProjectForm.tsx | Formular für Projekt Erstellen/Bearbeiten |
+| `MonthCalendar` | app/(protected)/kalender/(view)/_components/MonthCalendar.tsx | Monatsansicht mit klickbaren Tagen |
+| `CalendarEventDialog` | app/(protected)/kalender/(view)/_components/CalendarEventDialog.tsx | Dialog für Kalender-Ereignis Erstellen/Bearbeiten |

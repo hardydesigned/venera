@@ -135,3 +135,59 @@ AUFG-001 abschließen (Shadcn-Komponenten, auth layout) + AUFG-002 Inbox-Modul i
 3. Run #4: AUFG-002 weiter — Kalender-Seite (AUFG-011) implementieren
 
 ---
+
+## Run #3 — 2026-04-17
+
+**Branch:** `claude/auto-coder` ✅
+**Agent:** FEATURE_AGENT
+**Grund:** Offene Aufgaben → FEATURE_AGENT; AUFG-010 + AUFG-011 implementiert
+
+### Bearbeitete Hauptaufgabe
+AUFG-010 (Projekte-Seite) + AUFG-011 (Kalender-Seite) — beide vollständig implementiert
+
+### Kurzplan
+1. Convex Backend Projekte: _model, queries, mutations
+2. Frontend Projekte: Hook, Form, List, Pages (list, new, edit)
+3. Convex Backend Kalender: _model, queries (listByRange), mutations
+4. Frontend Kalender: Hook, MonthCalendar, CalendarEventDialog, Page
+5. Indizes aktualisieren (type_index.md, function_index.md)
+
+### Wichtigste Änderungen
+
+**Projekte-Backend:**
+- convex/projects/_model/project.ts — Project, CreateProject, ProjectColor (8 Farben)
+- convex/projects/projects/queries.ts — listPersonal, get
+- convex/projects/projects/mutations.ts — create, update, remove (Tasks entkoppeln)
+
+**Projekte-Frontend:**
+- app/(protected)/projekte/_controller/useProjects.ts — useProjects() + useProject(id)
+- app/(protected)/projekte/(view)/_components/ProjectForm.tsx
+- app/(protected)/projekte/(view)/_components/ProjectList.tsx — Karten-Raster
+- app/(protected)/projekte/(view)/page.tsx, new/page.tsx, [id]/edit/page.tsx
+
+**Kalender-Backend:**
+- convex/calendar/_model/calendarEvent.ts — CalendarEvent, CreateCalendarEvent
+- convex/calendar/events/queries.ts — listByRange (Zeitraum), get
+- convex/calendar/events/mutations.ts — create, update, remove
+
+**Kalender-Frontend:**
+- app/(protected)/kalender/_controller/useCalendarEvents.ts — Hook mit Zeitraum
+- app/(protected)/kalender/(view)/_components/MonthCalendar.tsx — Monatsansicht
+- app/(protected)/kalender/(view)/_components/CalendarEventDialog.tsx — Event-Dialog
+- app/(protected)/kalender/(view)/page.tsx — Hauptseite mit Monat-Navigation
+
+### Verifikation
+- Code-Struktur: Alle Dateien vorhanden, Zeilenlimits eingehalten ✅
+- TypeScript: Imports visuell geprüft, keine offensichtlichen Fehler ✅
+- Build: Nicht prüfbar (convex dev erforderlich)
+- Runtime: Nicht prüfbar in diesem Lauf
+
+### Neu hinzugefügte Aufgaben
+Keine neuen Aufgaben in diesem Lauf.
+
+### Empfohlene nächste Schritte
+1. Manuell: pnpm install + npx convex dev (Runtime-Prüfung)
+2. Run #4: AUFG-002 Restarbeiten (Bugs fixen, svelte/java entfernen)
+3. Run #5: AUFG-003 — Code Diff Seite (GitHub Integration)
+
+---

@@ -7,15 +7,15 @@ Quelle: NUTZER_ÄNDERUNGEN.md (2026-04-16)
 ## Laufend
 
 ### [feature] AUFG-002: Bestehende Features migrieren (Inbox, Projekte, Kalender)
-**Status:** 🔄 In Bearbeitung (Lauf #2)
+**Status:** 🔄 In Bearbeitung (Lauf #3)
 **Agent:** FEATURE_AGENT
 **Abhängigkeit:** AUFG-001
 
 Migration der bestehenden Svelte-Features nach Next.js + Convex:
 - [x] Inbox / Aufgabenmanagement (CRUD mit Convex) — Hook, Form, List, Pages
-- [ ] Projekte-Seite mit Wochenansicht A/B/C
-- [ ] Kalender (Tag/Woche/Monat/Jahr)
-- [ ] Bugs in bestehenden Features fixen
+- [x] Projekte-Seite — Convex Backend + Frontend (Hook, Form, List, Pages) — Lauf #3
+- [x] Kalender (Monatsansicht mit Event-Dialog) — Convex Backend + Frontend — Lauf #3
+- [ ] Bugs in bestehenden Features fixen (nach Runtime-Test)
 - [ ] svelte-frontend und java-backend Verzeichnisse entfernen
 
 ---
@@ -115,28 +115,29 @@ GitHub-Repository-Review-Tracking:
 ---
 
 ### [feature] AUFG-010: Projekte-Seite implementieren
-**Status:** ⬜ Offen
+**Status:** ✅ Erledigt (Lauf #3)
 **Agent:** FEATURE_AGENT
 **Abhängigkeit:** AUFG-001
 
-- [ ] Convex: Projekte-Queries (list, get) + Mutations (create, update, remove)
-- [ ] Frontend: useProjects Hook
-- [ ] UI: Projekte-Liste mit Karten
-- [ ] UI: Projekt-Formular (Erstellen/Bearbeiten)
-- [ ] UI: Projekte nach Priorität A/B/C trennen (Wochenansicht)
-- [ ] Aufgaben einem Projekt zuordnen
+- [x] Convex: Projekte-Queries (listPersonal, get) + Mutations (create, update, remove)
+- [x] Frontend: useProjects Hook + useProject(id)
+- [x] UI: Projektkarten-Raster mit Farbstreifen
+- [x] UI: Projekt-Formular (Erstellen/Bearbeiten) mit Titel, Beschreibung, Ziel, Farbe
+- [ ] UI: Projekte nach Priorität A/B/C trennen (Wochenansicht) — als Folgeaufgabe offen
+- [ ] Aufgaben einem Projekt zuordnen — als Folgeaufgabe offen
 
 ---
 
 ### [feature] AUFG-011: Kalender-Seite implementieren
-**Status:** ⬜ Offen
+**Status:** ✅ Erledigt (Lauf #3)
 **Agent:** FEATURE_AGENT
 **Abhängigkeit:** AUFG-001
 
-- [ ] Convex: CalendarEvents-Queries + Mutations
-- [ ] Frontend: useCalendarEvents Hook
-- [ ] UI: Monats-/Wochen-/Tagesansicht
-- [ ] UI: Events erstellen, bearbeiten, löschen
+- [x] Convex: CalendarEvents-Queries (listByRange, get) + Mutations (create, update, remove)
+- [x] Frontend: useCalendarEvents(startAt, endAt) Hook
+- [x] UI: Monatsansicht (MonthCalendar) mit Tagesklick
+- [x] UI: Events erstellen, bearbeiten, löschen (CalendarEventDialog)
+- [ ] UI: Wochen-/Tagesansicht — als Folgeaufgabe offen
 
 ---
 

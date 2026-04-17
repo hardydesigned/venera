@@ -20,6 +20,23 @@ Bevor ein neuer Typ erstellt wird, bitte hier nachschauen!
 | `CreateTask` | convex/tasks/_model/task.ts | Input-Schema für create/update Mutations |
 | `TaskFormData` | convex/tasks/_model/task.ts | Formular-Schema (partial für react-hook-form) |
 
+## Projekte
+
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `Project` | convex/projects/_model/project.ts | `Doc<"projects">` — Convex Projekt Dokument |
+| `ProjectColor` | convex/projects/_model/project.ts | `"gray" \| "red" \| "orange" \| ...` |
+| `CreateProject` | convex/projects/_model/project.ts | Input-Schema für create/update Mutations |
+| `ProjectFormData` | convex/projects/_model/project.ts | Formular-Schema (partial für react-hook-form) |
+
+## Kalender
+
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `CalendarEvent` | convex/calendar/_model/calendarEvent.ts | `Doc<"calendarEvents">` — Convex Kalender-Ereignis |
+| `CreateCalendarEvent` | convex/calendar/_model/calendarEvent.ts | Input-Schema für create/update Mutations |
+| `CalendarEventFormData` | convex/calendar/_model/calendarEvent.ts | Formular-Schema (partial für react-hook-form) |
+
 ## UI
 
 | Typ | Datei | Beschreibung |
