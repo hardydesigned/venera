@@ -60,4 +60,30 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_user_time", ["userId", "startAt"]),
+
+  // Code Diff: GitHub Repository Review-Tracking
+  codeDiffRepos: defineTable({
+    userId: v.id("users"),
+    orgId: v.optional(v.string()),
+    owner: v.string(),
+    name: v.string(),
+    token: v.optional(v.string()),
+    description: v.optional(v.string()),
+    defaultBranch: v.string(),
+    lastSyncAt: v.optional(v.number()),
+  }).index("by_user", ["userId"]),
+
+  codeDiffFiles: defineTable({
+    repoId: v.id("codeDiffRepos"),
+    path: v.string(),
+    status: v.union(
+      v.literal("needs_review"),
+      v.literal("reviewed"),
+      v.literal("todo"),
+      v.literal("always_green"),
+    ),
+    blobSha: v.optional(v.string()),
+  })
+    .index("by_repo", ["repoId"])
+    .index("by_repo_path", ["repoId", "path"]),
 });
