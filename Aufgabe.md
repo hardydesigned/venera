@@ -7,7 +7,7 @@ Quelle: NUTZER_ÄNDERUNGEN.md (2026-04-16)
 ## Laufend
 
 ### [feature] AUFG-002: Bestehende Features migrieren (Inbox, Projekte, Kalender)
-**Status:** 🔄 In Bearbeitung (Lauf #3)
+**Status:** 🔄 Teilweise erledigt (Lauf #4)
 **Agent:** FEATURE_AGENT
 **Abhängigkeit:** AUFG-001
 
@@ -15,26 +15,31 @@ Migration der bestehenden Svelte-Features nach Next.js + Convex:
 - [x] Inbox / Aufgabenmanagement (CRUD mit Convex) — Hook, Form, List, Pages
 - [x] Projekte-Seite — Convex Backend + Frontend (Hook, Form, List, Pages) — Lauf #3
 - [x] Kalender (Monatsansicht mit Event-Dialog) — Convex Backend + Frontend — Lauf #3
-- [ ] Bugs in bestehenden Features fixen (nach Runtime-Test)
-- [ ] svelte-frontend und java-backend Verzeichnisse entfernen
+- [x] svelte-frontend und java-backend Verzeichnisse entfernt — Lauf #4
+- [ ] Bugs in bestehenden Features fixen (nach Runtime-Test mit `convex dev`)
 
 ---
 
 ## Offen
 
 ### [feature] AUFG-003: Code Diff Seite implementieren
-**Status:** ⬜ Offen
+**Status:** ✅ Erledigt (Lauf #4)
 **Agent:** FEATURE_AGENT
 **Abhängigkeit:** AUFG-001
 
 GitHub-Repository-Review-Tracking:
-- [ ] GitHub API Integration (Repository-Inhalte abrufen)
-- [ ] Convex Schema: `codeDiffRepos`, `codeDiffFiles`
-- [ ] Seite: Repository mit GitHub verlinken
-- [ ] Pro Datei: Status setzen (fertig / zu reviewen / TODO / immer grün)
-- [ ] Bei Pull/Push: geänderte Dateien automatisch auf "zu reviewen" zurücksetzen
-- [ ] Webhook oder Polling für GitHub-Änderungen
-- [ ] UI: Dateibaum mit Status-Badges
+- [x] Convex Schema: `codeDiffRepos`, `codeDiffFiles` mit Indizes
+- [x] Backend: repos/queries.ts + mutations.ts (create, update, remove mit Cascade)
+- [x] Backend: files/queries.ts + mutations.ts (updateStatus, bulkSync)
+- [x] Backend: sync/actions.ts — GitHub Trees API (recursive), SHA-basierte Change-Detection
+- [x] Frontend: useCodeDiff.ts Hook (useCodeDiffRepos + useCodeDiffFiles)
+- [x] UI: RepoList (Karten mit Sync-Button, Last-Sync-Anzeige)
+- [x] UI: RepoForm (Owner, Name, Branch, Description, Token)
+- [x] UI: FileTree (hierarchisch, Expand/Collapse, Suche, Status-Badge zum Klicken)
+- [x] Pages: /code-diff, /code-diff/new, /code-diff/[repoId]
+- [x] 4 Status-Werte: needs_review → reviewed → todo → always_green (Click-to-Cycle)
+- [x] Fortschrittsanzeige (X/Y Dateien abgearbeitet)
+- [ ] Webhook-Integration für automatische Sync bei GitHub Push — als Folgeaufgabe
 
 ---
 

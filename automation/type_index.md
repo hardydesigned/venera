@@ -37,6 +37,16 @@ Bevor ein neuer Typ erstellt wird, bitte hier nachschauen!
 | `CreateCalendarEvent` | convex/calendar/_model/calendarEvent.ts | Input-Schema für create/update Mutations |
 | `CalendarEventFormData` | convex/calendar/_model/calendarEvent.ts | Formular-Schema (partial für react-hook-form) |
 
+## Code Diff
+
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `CodeDiffRepo` | convex/codediff/_model/repo.ts | `Doc<"codeDiffRepos">` — GitHub Repository |
+| `CreateCodeDiffRepo` | convex/codediff/_model/repo.ts | Input-Schema für create Mutation |
+| `RepoFormData` | convex/codediff/_model/repo.ts | Formular-Schema |
+| `CodeDiffFile` | convex/codediff/_model/file.ts | `Doc<"codeDiffFiles">` — Datei mit Status |
+| `FileStatus` | convex/codediff/_model/file.ts | `"needs_review" \| "reviewed" \| "todo" \| "always_green"` |
+
 ## UI
 
 | Typ | Datei | Beschreibung |

@@ -81,6 +81,37 @@ Bevor eine neue Funktion implementiert wird, bitte hier nachschauen!
 | `update` | api.calendar.events.mutations.update | Event aktualisieren |
 | `remove` | api.calendar.events.mutations.remove | Event löschen |
 
+## Hooks — Code Diff
+
+| Hook | Datei | Beschreibung |
+|------|-------|-------------|
+| `useCodeDiffRepos()` | app/(protected)/code-diff/_controller/useCodeDiff.ts | Repos laden + CRUD + GitHub-Sync |
+| `useCodeDiffFiles(repoId)` | app/(protected)/code-diff/_controller/useCodeDiff.ts | Dateien eines Repos + updateStatus |
+
+## Convex Queries — Code Diff
+
+| Funktion | API-Pfad | Beschreibung |
+|----------|----------|-------------|
+| `list` | api.codediff.repos.queries.list | Alle Repos des Users |
+| `get` | api.codediff.repos.queries.get | Einzelnes Repo per ID |
+| `listByRepo` | api.codediff.files.queries.listByRepo | Alle Dateien eines Repos |
+
+## Convex Mutations — Code Diff
+
+| Funktion | API-Pfad | Beschreibung |
+|----------|----------|-------------|
+| `create` | api.codediff.repos.mutations.create | Repo erstellen |
+| `update` | api.codediff.repos.mutations.update | Repo aktualisieren |
+| `remove` | api.codediff.repos.mutations.remove | Repo + Dateien löschen (Cascade) |
+| `updateStatus` | api.codediff.files.mutations.updateStatus | Datei-Status setzen |
+| `bulkSync` | api.codediff.files.mutations.bulkSync | Bulk-Upsert nach GitHub-Sync |
+
+## Convex Actions — Code Diff
+
+| Funktion | API-Pfad | Beschreibung |
+|----------|----------|-------------|
+| `syncRepoFromGitHub` | api.codediff.sync.actions.syncRepoFromGitHub | GitHub Trees API abrufen + DB updaten |
+
 ## Komponenten
 
 | Komponente | Datei | Beschreibung |
@@ -92,3 +123,6 @@ Bevor eine neue Funktion implementiert wird, bitte hier nachschauen!
 | `ProjectForm` | app/(protected)/projekte/(view)/_components/ProjectForm.tsx | Formular für Projekt Erstellen/Bearbeiten |
 | `MonthCalendar` | app/(protected)/kalender/(view)/_components/MonthCalendar.tsx | Monatsansicht mit klickbaren Tagen |
 | `CalendarEventDialog` | app/(protected)/kalender/(view)/_components/CalendarEventDialog.tsx | Dialog für Kalender-Ereignis Erstellen/Bearbeiten |
+| `RepoList` | app/(protected)/code-diff/(view)/_components/RepoList.tsx | Repository-Karten mit Sync-Button |
+| `RepoForm` | app/(protected)/code-diff/(view)/_components/RepoForm.tsx | Formular zum Repository hinzufügen |
+| `FileTree` | app/(protected)/code-diff/(view)/_components/FileTree.tsx | Hierarchischer Dateibaum mit Status-Badges |

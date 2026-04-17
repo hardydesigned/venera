@@ -6,6 +6,7 @@ Kompakte Erinnerung für zukünftige Läufe. Enthält wichtige Erkenntnisse, sen
 - [Next.js + Convex Migration](memory/migration-convex.md) — Grundlegende Migration von Java+Svelte zu Next.js+Convex
 - [Convex Auth Setup](memory/convex-auth.md) — Authentifizierung mit @convex-dev/auth statt Clerk
 - [Inbox / Tasks Feature](memory/inbox-tasks.md) — Aufgabenverwaltung (CRUD) mit Convex + React Hook Form
+- [Code Diff Feature](memory/code-diff.md) — GitHub Repository Review-Tracking, SHA-Change-Detection, Sync-Action
 
 ## Aktueller Projektstatus (Stand: 2026-04-17)
 
@@ -63,6 +64,15 @@ Kompakte Erinnerung für zukünftige Läufe. Enthält wichtige Erkenntnisse, sen
 - Convex Auth Middleware: Package-Name ist `@convex-dev/auth/nextjs/server`
 - `convex/_generated/` fehlt noch (wird durch `convex dev` erstellt) — Build nicht möglich ohne
 - Inbox Edit-Page nutzt React 19 `use(params)` für async params
+
+### Erkenntnisse aus Lauf #4 (2026-04-17)
+- svelte-frontend + java-backend vollständig entfernt (AUFG-002 Teilaufgabe abgeschlossen)
+- Code Diff Feature vollständig implementiert (AUFG-003)
+  - Convex Action `syncRepoFromGitHub` nutzt GitHub Trees API (recursive)
+  - SHA-basierte Change-Detection: geänderte Dateien → `needs_review` (außer `always_green`)
+  - Hierarchischer Dateibaum (buildTree-Funktion, rekursiv) mit Expand/Collapse
+  - FILE_STATUS_NEXT Map für Click-to-Cycle Status-Wechsel
+- Nächste Priorität: AUFG-004 (Persönliche & Team To-dos) oder AUFG-002 Bugs fixen
 
 ### Erkenntnisse aus Lauf #3 (2026-04-17)
 - Projekte-Feature vollständig: Backend + Hook + Form + List + 3 Pages

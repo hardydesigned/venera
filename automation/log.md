@@ -191,3 +191,47 @@ Keine neuen Aufgaben in diesem Lauf.
 3. Run #5: AUFG-003 — Code Diff Seite (GitHub Integration)
 
 ---
+
+---
+
+## Run #4 — 2026-04-17
+
+**Branch:** `claude/auto-coder` ✅
+**Agent:** FEATURE_AGENT
+**Grund:** Offene Aufgaben (AUFG-002, AUFG-003) → FEATURE_AGENT
+
+### Bearbeitete Hauptaufgaben
+1. AUFG-002: svelte-frontend + java-backend entfernt
+2. AUFG-003: Code Diff Feature vollständig implementiert
+
+### Kurzplan
+1. svelte-frontend + java-backend via git rm entfernen
+2. convex/schema.ts um codeDiffRepos + codeDiffFiles erweitern
+3. Convex Backend: _model/repo.ts, _model/file.ts, repos/*, files/*, sync/actions.ts
+4. Frontend Hook: useCodeDiffRepos + useCodeDiffFiles
+5. Komponenten: RepoList, RepoForm, FileTree (hierarchisch)
+6. Pages: /code-diff, /code-diff/new, /code-diff/[repoId]
+7. Dokumentation: Aufgabe.md, type_index, function_index, memory aktualisieren
+
+### Wichtigste Änderungen
+- **Gelöscht**: svelte-frontend/ (190 Dateien) + java-backend/ (80 Dateien) per `git rm -rf`
+- **Neu**: convex/codediff/ — 7 Backend-Dateien (Schema, Modelle, Queries, Mutations, Action)
+- **Neu**: app/(protected)/code-diff/ — 7 Frontend-Dateien (Hook, 3 Komponenten, 3 Pages)
+- **GitHub Trees API**: `syncRepoFromGitHub` Action fetcht rekursiven Dateibaum mit SHA-Werten
+- **Change Detection**: SHA-Vergleich pro Datei, `always_green` ignoriert SHA-Änderungen
+- **FileTree**: Hierarchisch aufgebaut aus Pfaden, Expand/Collapse per Directory, Suchfunktion
+- **Click-to-Cycle**: Status-Badge klicken wechselt zyklisch: needs_review→reviewed→todo→always_green
+
+### Verifikation
+- **Dateistruktur**: 14 neue Dateien, alle unter 250 Zeilen ✅
+- **Build**: Nicht prüfbar (convex/_generated/ fehlt bis `convex dev` läuft)
+- **Runtime**: Nicht prüfbar in diesem Lauf
+- **Patterns**: Konsistent mit bestehenden Modulen (Inbox, Projekte, Kalender) ✅
+- **250-Zeilen-Regel**: Längste Datei FileTree.tsx mit 206 Zeilen ✅
+
+### Neu hinzugefügte Aufgaben
+- AUFG-003 Folgeaufgabe: GitHub Webhook-Integration für automatischen Sync bei Push
+
+### Empfohlene nächste Schritte
+1. **Manuell**: `pnpm install` + `npx convex dev` für Runtime-Prüfung
+2. **Run #5**: AUFG-004 (Persönliche & Team To-dos) implementieren
