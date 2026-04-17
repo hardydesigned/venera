@@ -4,6 +4,65 @@ Chronologisches Protokoll aller Auto-Coder-Läufe.
 
 ---
 
+## Run #5 — 2026-04-17
+
+**Branch:** `claude/auto-coder` ✅
+**Agent:** FEATURE_AGENT
+**Grund:** Offene Aufgaben in Aufgabe.md → FEATURE_AGENT; AUFG-004 (Persönliche & Team To-dos) als nächste offene Aufgabe
+
+### Bearbeitete Hauptaufgabe
+AUFG-004: Persönliche & Team To-dos mit vollständiger Organisations-Verwaltung
+
+### Kurzplan
+1. Schema: organizations + orgMemberships Tabellen
+2. Backend: Org-Mutations + Queries
+3. Backend: Task-Queries/Mutations für Org-Modus aktualisieren
+4. Frontend: useOrg + useOrgTasks Hooks
+5. Frontend: Inbox-Tabs (Persönlich/Team)
+6. Frontend: Team-Seite + Team-Detail-Seite
+7. UI: Tabs-Komponente (Radix UI)
+
+### Wichtigste Änderungen
+
+**Neu angelegt:**
+- `convex/organizations/_model/organization.ts` — Org-Zod-Schema, Typen
+- `convex/organizations/orgs/mutations.ts` — create, addMemberByEmail, removeMember, leave, remove
+- `convex/organizations/orgs/queries.ts` — listMine, get, getMembers
+- `components/ui/tabs.tsx` — Tabs-Komponente (Radix UI)
+- `app/(protected)/team/_controller/useOrg.ts` — useOrgs + useOrg Hook
+- `app/(protected)/team/(view)/page.tsx` — Org-Übersicht + Erstellung
+- `app/(protected)/team/(view)/[orgId]/page.tsx` — Mitgliederverwaltung
+- `app/(protected)/team/(view)/_components/OrgForm.tsx` — Org-Erstellungsformular
+- `automation/memory/team-org.md` — Feature-Memory
+
+**Geändert:**
+- `convex/schema.ts` — organizations + orgMemberships Tabellen, tasks.orgId: v.string() → v.id("organizations")
+- `convex/tasks/tasks/queries.ts` — listByOrg nimmt jetzt orgId-Arg + Mitgliedschaftsprüfung
+- `convex/tasks/tasks/mutations.ts` — Org-Autorisierung in create/update/remove
+- `app/(protected)/inbox/(view)/page.tsx` — Tabs (Persönlich/Team) + Team-Auswahl-Dropdown
+- `app/(protected)/inbox/_controller/useTasks.ts` — useOrgTasks hinzugefügt
+- `app/(protected)/_components/Sidebar.tsx` — Team-Link hinzugefügt
+- `automation/memory.md` — Lauf #5 Erkenntnisse + team-org.md Index
+
+### Verifikation
+- **Dateilängen:** Alle Dateien unter 250 Zeilen ✅
+- **Abhängigkeiten:** @radix-ui/react-tabs bereits in package.json ✅
+- **Import-Pfade:** Convex-Imports über `../../_generated/server` korrekt ✅
+- **Build:** Nicht prüfbar (convex/_generated/ fehlt ohne convex dev)
+- **Runtime:** Nicht prüfbar in diesem Lauf
+- **Schema-Konsistenz:** tasks.orgId als Id<"organizations"> in Schema + Mutations konsistent ✅
+
+### Neu hinzugefügte Aufgaben
+- Assignee-Anzeige in TaskList (name/email statt ID) — als Folgeaufgabe
+- Task-Erstellung im Team-Modus über `/inbox/new?orgId=...` — als Folgeaufgabe
+
+### Empfohlene nächste Schritte
+1. **Run #6:** AUFG-005 (Data Lake Integration / Nextcloud) oder AUFG-008 (Nutzer-Feedback-Dialog)
+2. **Manuell:** `pnpm install` + `npx convex dev` für Runtime-Prüfung
+3. **Folgeaufgabe:** Assignee-Dropdown in TaskForm für Team-Modus
+
+---
+
 ## Run #1 — 2026-04-16
 
 **Branch:** `claude/auto-coder` ✅

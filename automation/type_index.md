@@ -47,6 +47,17 @@ Bevor ein neuer Typ erstellt wird, bitte hier nachschauen!
 | `CodeDiffFile` | convex/codediff/_model/file.ts | `Doc<"codeDiffFiles">` — Datei mit Status |
 | `FileStatus` | convex/codediff/_model/file.ts | `"needs_review" \| "reviewed" \| "todo" \| "always_green"` |
 
+## Organisationen / Team
+
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `Organization` | convex/organizations/_model/organization.ts | `Doc<"organizations">` — Convex Org Dokument |
+| `OrgMembership` | convex/organizations/_model/organization.ts | `Doc<"orgMemberships">` — Mitgliedschaft |
+| `OrgRole` | convex/organizations/_model/organization.ts | `"owner" \| "member"` |
+| `CreateOrg` | convex/organizations/_model/organization.ts | Input-Schema für create Mutation |
+| `OrgFormData` | convex/organizations/_model/organization.ts | Formular-Schema |
+| `OrgMemberWithUser` | convex/organizations/_model/organization.ts | Mitglied + User-Details für UI |
+
 ## UI
 
 | Typ | Datei | Beschreibung |

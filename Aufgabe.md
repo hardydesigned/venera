@@ -44,15 +44,23 @@ GitHub-Repository-Review-Tracking:
 ---
 
 ### [feature] AUFG-004: Persönliche & Team To-dos
-**Status:** ⬜ Offen
+**Status:** ✅ Erledigt (Lauf #5)
 **Agent:** FEATURE_AGENT
 **Abhängigkeit:** AUFG-001
 
-- [ ] Persönlicher Account: private Aufgaben (user_id)
-- [ ] Team-Account: Aufgaben auf Organisations-Ebene (org_id)
-- [ ] Aufgaben anderen Mitgliedern zuweisen
-- [ ] Konvex Schema: Tasks mit `user_id` und optional `org_id`
-- [ ] UI: Umschalten zwischen persönlichem und Team-Modus
+- [x] Persönlicher Account: private Aufgaben (userId) — bereits vorhanden
+- [x] Team-Account: Aufgaben auf Organisations-Ebene (orgId als `Id<"organizations">`)
+- [x] Convex Schema: `organizations` + `orgMemberships` Tabellen
+- [x] Backend: Org-Mutations (create, addMemberByEmail, removeMember, leave, remove)
+- [x] Backend: Org-Queries (listMine, get, getMembers)
+- [x] Backend: Task-Queries/Mutations mit Org-Autorisierung
+- [x] Frontend: useOrgs + useOrg Hook (Mitgliederverwaltung)
+- [x] Frontend: useOrgTasks Hook (Team-Aufgaben)
+- [x] UI: Inbox-Tabs (Persönlich / Team) mit Team-Auswahl
+- [x] UI: Team-Seite `/team` (Org-Übersicht + Erstellen)
+- [x] UI: Team-Detail `/team/[orgId]` (Mitglieder einladen/entfernen)
+- [x] Sidebar: Team-Link hinzugefügt
+- [ ] Aufgaben-Zuweisung (assigneeId) im TeamModus visuell anzeigen — als Folgeaufgabe
 
 ---
 

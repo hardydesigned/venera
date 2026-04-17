@@ -81,6 +81,32 @@ Bevor eine neue Funktion implementiert wird, bitte hier nachschauen!
 | `update` | api.calendar.events.mutations.update | Event aktualisieren |
 | `remove` | api.calendar.events.mutations.remove | Event löschen |
 
+## Hooks — Team / Organisationen
+
+| Hook | Datei | Beschreibung |
+|------|-------|-------------|
+| `useOrgs()` | app/(protected)/team/_controller/useOrg.ts | Alle Orgs des Users + create + remove |
+| `useOrg(orgId)` | app/(protected)/team/_controller/useOrg.ts | Einzelne Org + Mitglieder + addMember + removeMember + leave |
+| `useOrgTasks(orgId)` | app/(protected)/inbox/_controller/useTasks.ts | Team-Aufgaben einer Org + CRUD |
+
+## Convex Queries — Organisationen
+
+| Funktion | API-Pfad | Beschreibung |
+|----------|----------|-------------|
+| `listMine` | api.organizations.orgs.queries.listMine | Alle Orgs des Users (mit Rolle) |
+| `get` | api.organizations.orgs.queries.get | Einzelne Org per ID (mit Mitgliedschaftsprüfung) |
+| `getMembers` | api.organizations.orgs.queries.getMembers | Mitgliederliste einer Org (userId, role, email, name) |
+
+## Convex Mutations — Organisationen
+
+| Funktion | API-Pfad | Beschreibung |
+|----------|----------|-------------|
+| `create` | api.organizations.orgs.mutations.create | Org erstellen + Owner-Membership |
+| `addMemberByEmail` | api.organizations.orgs.mutations.addMemberByEmail | Mitglied per E-Mail einladen |
+| `removeMember` | api.organizations.orgs.mutations.removeMember | Mitglied entfernen (nur Owner) |
+| `leave` | api.organizations.orgs.mutations.leave | Org verlassen (nur Mitglieder) |
+| `remove` | api.organizations.orgs.mutations.remove | Org löschen (nur Owner, Cascade) |
+
 ## Hooks — Code Diff
 
 | Hook | Datei | Beschreibung |
@@ -126,3 +152,4 @@ Bevor eine neue Funktion implementiert wird, bitte hier nachschauen!
 | `RepoList` | app/(protected)/code-diff/(view)/_components/RepoList.tsx | Repository-Karten mit Sync-Button |
 | `RepoForm` | app/(protected)/code-diff/(view)/_components/RepoForm.tsx | Formular zum Repository hinzufügen |
 | `FileTree` | app/(protected)/code-diff/(view)/_components/FileTree.tsx | Hierarchischer Dateibaum mit Status-Badges |
+| `OrgForm` | app/(protected)/team/(view)/_components/OrgForm.tsx | Formular für Org erstellen (name + slug) |
