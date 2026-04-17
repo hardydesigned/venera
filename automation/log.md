@@ -70,3 +70,68 @@ AUFG-001: Next.js + Convex Foundation aufbauen (Migration von Svelte+Java zu Nex
 3. **Run #3:** AUFG-002: Inbox/Tasks-Seite migrieren (erste echte Feature-Seite)
 
 ---
+
+## Run #2 — 2026-04-17
+
+**Branch:** `claude/auto-coder` ✅
+**Agent:** FEATURE_AGENT
+**Grund:** Offene Aufgaben in Aufgabe.md → FEATURE_AGENT; AUFG-001 restliche Items + AUFG-002 (Inbox)
+
+### Bearbeitete Hauptaufgabe
+AUFG-001 abschließen (Shadcn-Komponenten, auth layout) + AUFG-002 Inbox-Modul implementieren
+
+### Kurzplan
+1. Fehlende Shadcn UI-Komponenten erstellen (form, select, dialog, badge, scroll-area, dropdown-menu, separator, checkbox, textarea)
+2. app/(auth)/layout.tsx erstellen
+3. components/DeleteConfirmDialog.tsx als wiederverwendbarer Lösch-Dialog
+4. Convex get-Query für Tasks ergänzen
+5. Inbox-Hook (useTasks, useTask) erstellen
+6. Inbox-Komponenten (TaskList, TaskForm) erstellen
+7. Inbox-Pages (list, new, edit) erstellen
+8. Sidebar aktualisieren (Dashboard-Icon, Inbox-Route)
+
+### Wichtigste Änderungen
+
+**Neu angelegt (Shadcn UI):**
+- components/ui/form.tsx — React Hook Form Integration
+- components/ui/select.tsx — Radix UI Select
+- components/ui/dialog.tsx — Radix UI Dialog
+- components/ui/badge.tsx — Badge Varianten
+- components/ui/scroll-area.tsx — Scroll-Bereich
+- components/ui/dropdown-menu.tsx — Dropdown-Menü
+- components/ui/separator.tsx — Trennlinie
+- components/ui/checkbox.tsx — Checkbox
+- components/ui/textarea.tsx — Mehrzeiliges Textfeld
+
+**Neu angelegt (Auth + Utils):**
+- app/(auth)/layout.tsx — Auth-Wrapper-Layout
+- components/DeleteConfirmDialog.tsx — Wiederverwendbarer Lösch-Dialog
+
+**Neu angelegt (Inbox-Modul):**
+- app/(protected)/inbox/_controller/useTasks.ts — Hook (useTasks, useTask)
+- app/(protected)/inbox/(view)/_components/TaskList.tsx — Aufgaben-Liste
+- app/(protected)/inbox/(view)/_components/TaskForm.tsx — Erstellen/Bearbeiten-Formular
+- app/(protected)/inbox/(view)/page.tsx — Inbox-Übersicht
+- app/(protected)/inbox/(view)/new/page.tsx — Neue Aufgabe
+- app/(protected)/inbox/(view)/[id]/edit/page.tsx — Aufgabe bearbeiten
+
+**Geändert:**
+- convex/tasks/tasks/queries.ts — get Query ergänzt
+- app/(protected)/_components/Sidebar.tsx — LayoutDashboard-Icon, Inbox-Route
+
+### Verifikation
+- Code-Struktur: Alle geplanten Dateien vorhanden ✅
+- Build: Noch nicht geprüft (pnpm install + convex dev nötig)
+- TypeScript: Imports und Typen visuell geprüft — keine offensichtlichen Fehler
+- Runtime: Nicht prüfbar (convex/_generated/ fehlt noch)
+
+### Neu hinzugefügte Aufgaben
+- AUFG-010: Projekte-Seite implementieren
+- AUFG-011: Kalender-Seite implementieren
+
+### Empfohlene nächste Schritte
+1. Manuell: pnpm install + npx convex dev zur Runtime-Prüfung
+2. Run #3: AUFG-002 weiter — Projekte-Seite (AUFG-010) implementieren
+3. Run #4: AUFG-002 weiter — Kalender-Seite (AUFG-011) implementieren
+
+---

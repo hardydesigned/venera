@@ -1,8 +1,8 @@
 {
   "last_agent_used": "FEATURE_AGENT",
   "next_agent": "FEATURE_AGENT",
-  "last_run_timestamp": "2026-04-16T00:00:00Z",
-  "last_task_id": "AUFG-001-next-convex-foundation",
-  "run_count": 1,
-  "notes": "AUFG-001 in Bearbeitung - Foundation angelegt, pnpm install + convex dev noch ausstehend. Weiterhin FEATURE_AGENT da offene Aufgaben vorhanden."
+  "last_run_timestamp": "2026-04-17T00:00:00Z",
+  "last_task_id": "AUFG-002-inbox-tasks-frontend",
+  "run_count": 2,
+  "notes": "AUFG-001 abgeschlossen. AUFG-002 teilweise erledigt: Inbox/Tasks fertig. Nächster Schritt: Projekte-Seite (AUFG-010). Weiterhin FEATURE_AGENT da noch offene Aufgaben."
 }

@@ -6,56 +6,21 @@ Quelle: NUTZER_ÄNDERUNGEN.md (2026-04-16)
 
 ## Laufend
 
-### [feature] AUFG-001: Next.js + Convex Foundation aufbauen
-**Status:** 🔄 In Bearbeitung (Lauf #1)
-**Agent:** FEATURE_AGENT
-
-Aufbau der kompletten Next.js + Convex Basis als Ersatz für den bestehenden Svelte+Java Stack.
-
-- [x] package.json mit allen Abhängigkeiten
-- [x] next.config.ts
-- [x] tsconfig.json, postcss.config.mjs
-- [x] convex/schema.ts mit authTables + tasks/projects/calendarEvents
-- [x] convex/auth.ts (Convex Auth Password Provider)
-- [x] convex/auth.config.ts
-- [x] convex/http.ts (HTTP-Routes für Auth)
-- [x] convex/lib/auth.ts (requireAuth Helper)
-- [x] convex/tasks/_model/task.ts (Zod Schema)
-- [x] convex/tasks/tasks/queries.ts (listPersonal, listByOrg)
-- [x] convex/tasks/tasks/mutations.ts (create, update, remove)
-- [x] middleware.ts (Route Protection via convexAuthNextjsMiddleware)
-- [x] app/layout.tsx (Root Layout mit ConvexAuthNextjsServerProvider)
-- [x] app/globals.css (Tailwind v4 + CSS Variables)
-- [x] lib/utils.ts (cn() Helper)
-- [x] components/ConvexClientProvider.tsx
-- [x] app/(auth)/login/page.tsx — Login-Seite
-- [x] app/(auth)/register/page.tsx — Registrierungs-Seite
-- [x] app/(protected)/layout.tsx — Geschützte Layout mit Sidebar
-- [x] app/(protected)/_components/Sidebar.tsx — Navigation
-- [x] app/(protected)/page.tsx — Dashboard
-- [x] components/ui/{button,input,label,card}.tsx (Shadcn-Basis)
-- [x] .env.local.example
-- [ ] **Noch offen**: `pnpm install` + `convex dev` für erste Runtime-Prüfung
-- [ ] **Noch offen**: app/(auth)/layout.tsx (optionales Wrapper-Layout)
-- [ ] **Noch offen**: Vollständige Shadcn-Komponenten (form, select, dialog, etc.)
-
----
-
-## Offen
-
 ### [feature] AUFG-002: Bestehende Features migrieren (Inbox, Projekte, Kalender)
-**Status:** ⬜ Offen
+**Status:** 🔄 In Bearbeitung (Lauf #2)
 **Agent:** FEATURE_AGENT
 **Abhängigkeit:** AUFG-001
 
 Migration der bestehenden Svelte-Features nach Next.js + Convex:
-- [ ] Inbox / Aufgabenmanagement (CRUD mit Convex)
+- [x] Inbox / Aufgabenmanagement (CRUD mit Convex) — Hook, Form, List, Pages
 - [ ] Projekte-Seite mit Wochenansicht A/B/C
 - [ ] Kalender (Tag/Woche/Monat/Jahr)
 - [ ] Bugs in bestehenden Features fixen
 - [ ] svelte-frontend und java-backend Verzeichnisse entfernen
 
 ---
+
+## Offen
 
 ### [feature] AUFG-003: Code Diff Seite implementieren
 **Status:** ⬜ Offen
@@ -149,6 +114,61 @@ GitHub-Repository-Review-Tracking:
 
 ---
 
+### [feature] AUFG-010: Projekte-Seite implementieren
+**Status:** ⬜ Offen
+**Agent:** FEATURE_AGENT
+**Abhängigkeit:** AUFG-001
+
+- [ ] Convex: Projekte-Queries (list, get) + Mutations (create, update, remove)
+- [ ] Frontend: useProjects Hook
+- [ ] UI: Projekte-Liste mit Karten
+- [ ] UI: Projekt-Formular (Erstellen/Bearbeiten)
+- [ ] UI: Projekte nach Priorität A/B/C trennen (Wochenansicht)
+- [ ] Aufgaben einem Projekt zuordnen
+
+---
+
+### [feature] AUFG-011: Kalender-Seite implementieren
+**Status:** ⬜ Offen
+**Agent:** FEATURE_AGENT
+**Abhängigkeit:** AUFG-001
+
+- [ ] Convex: CalendarEvents-Queries + Mutations
+- [ ] Frontend: useCalendarEvents Hook
+- [ ] UI: Monats-/Wochen-/Tagesansicht
+- [ ] UI: Events erstellen, bearbeiten, löschen
+
+---
+
 ## Erledigt
 
-_(Noch leer – erste erledigte Aufgaben folgen nach Verifikation)_
+### [feature] AUFG-001: Next.js + Convex Foundation aufbauen
+**Status:** ✅ Erledigt (Lauf #1 + #2)
+**Agent:** FEATURE_AGENT
+
+- [x] package.json mit allen Abhängigkeiten
+- [x] next.config.ts
+- [x] tsconfig.json, postcss.config.mjs
+- [x] convex/schema.ts mit authTables + tasks/projects/calendarEvents
+- [x] convex/auth.ts (Convex Auth Password Provider)
+- [x] convex/auth.config.ts
+- [x] convex/http.ts (HTTP-Routes für Auth)
+- [x] convex/lib/auth.ts (requireAuth Helper)
+- [x] convex/tasks/_model/task.ts (Zod Schema)
+- [x] convex/tasks/tasks/queries.ts (listPersonal, listByOrg, get)
+- [x] convex/tasks/tasks/mutations.ts (create, update, remove)
+- [x] middleware.ts (Route Protection via convexAuthNextjsMiddleware)
+- [x] app/layout.tsx (Root Layout mit ConvexAuthNextjsServerProvider)
+- [x] app/(auth)/layout.tsx — Auth-Wrapper-Layout
+- [x] app/globals.css (Tailwind v4 + CSS Variables)
+- [x] lib/utils.ts (cn() Helper)
+- [x] components/ConvexClientProvider.tsx
+- [x] app/(auth)/login/page.tsx — Login-Seite
+- [x] app/(auth)/register/page.tsx — Registrierungs-Seite
+- [x] app/(protected)/layout.tsx — Geschützte Layout mit Sidebar
+- [x] app/(protected)/_components/Sidebar.tsx — Navigation
+- [x] app/(protected)/page.tsx — Dashboard
+- [x] components/ui/{button,input,label,card,form,select,dialog,badge,scroll-area,dropdown-menu,separator,checkbox,textarea}.tsx (Shadcn-Basis)
+- [x] components/DeleteConfirmDialog.tsx — Wiederverwendbarer Lösch-Dialog
+- [x] .env.local.example
+- [ ] **Noch offen**: `pnpm install` + `convex dev` für erste Runtime-Prüfung (manuell erforderlich)

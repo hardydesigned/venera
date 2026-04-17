@@ -6,6 +6,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
+  LayoutDashboard,
   CheckSquare,
   FolderKanban,
   CalendarDays,
@@ -14,7 +15,8 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { href: "/", label: "Inbox", icon: CheckSquare },
+  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/inbox", label: "Inbox", icon: CheckSquare },
   { href: "/projekte", label: "Projekte", icon: FolderKanban },
   { href: "/kalender", label: "Kalender", icon: CalendarDays },
   { href: "/code-diff", label: "Code Diff", icon: GitDiff },
