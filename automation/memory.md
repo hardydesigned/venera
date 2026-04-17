@@ -70,6 +70,19 @@ Kompakte Erinnerung für zukünftige Läufe. Enthält wichtige Erkenntnisse, sen
 - `convex/_generated/` fehlt noch (wird durch `convex dev` erstellt) — Build nicht möglich ohne
 - Inbox Edit-Page nutzt React 19 `use(params)` für async params
 
+### Erkenntnisse aus Lauf #9 (2026-04-18)
+- AUFG-006 Folgeaufgabe: Agent-Connections UI vollständig implementiert
+- `AgentForm.tsx` erweitert: neue Card-Sektion mit Checkbox-Liste für Data Lake Verbindungen
+  - `connections` field: `["datalake:${id}", ...]` Format bereits im Modell/run-action vorhanden
+  - `form.watch("connections")` + `form.setValue(...)` für manuelles Array-Toggle
+  - prop `dataLakeConnections: DataLakeConnection[]` hinzugefügt
+- `new/page.tsx`: lädt jetzt `useDataLakeConnections()` und gibt sie an AgentForm weiter
+- `[id]/edit/page.tsx`: neu erstellt — vollständige Agent-Bearbeitungsseite mit React 19 `use(params)`
+- `AgentList.tsx`: "Bearbeiten" Link im Dropdown hinzugefügt (`/agenten/${id}/edit`)
+- `[id]/page.tsx`: Bearbeiten-Button + Card mit verknüpften Connections (Badge-Darstellung)
+- Alle Dateien unter 250 Zeilen ✅
+- Nächste offene Aufgaben: AUFG-009 (Dokumentation), AUFG-006 Cron-Scheduler, AUFG-002 Bugs
+
 ### Erkenntnisse aus Lauf #8 (2026-04-17)
 - AUFG-007 vollständig implementiert: Telegram Bot Integration
 - Schema: `telegramSettings` Tabelle neu in schema.ts

@@ -4,6 +4,45 @@ Chronologisches Protokoll aller Auto-Coder-Läufe.
 
 ---
 
+## Run #9 — 2026-04-18
+
+**Branch:** `claude/auto-coder` ✅
+**Agent:** FEATURE_AGENT
+**Grund:** Offene Aufgaben vorhanden (AUFG-006 Teilaufgabe: Agent-Connections UI)
+
+### Bearbeitete Hauptaufgabe
+AUFG-006 Folgeaufgabe: Agenten-Verbindungen UI — Verknüpfung von KI-Agenten mit Data Lake Connections
+
+### Kurzplan
+1. AgentForm: Checkbox-Sektion für Data Lake Connections (connections-Feld → `"datalake:${id}"`)
+2. new/page.tsx: Connections laden und weitergeben
+3. [id]/edit/page.tsx: Agent-Bearbeitungsseite erstellen (fehlte komplett)
+4. AgentList.tsx: Edit-Link im Dropdown ergänzen
+5. [id]/page.tsx: Connections-Badge-Anzeige + Edit-Button
+
+### Wichtigste Änderungen
+- `AgentForm.tsx` — neue Sektion "Data Lake Verbindungen" mit Checkbox-Liste; prop `dataLakeConnections` hinzugefügt
+- `new/page.tsx` — `useDataLakeConnections()` geladen und an AgentForm übergeben
+- `[id]/edit/page.tsx` — komplett neu erstellt (Agent-Bearbeitungsseite, React 19 `use(params)`)
+- `AgentList.tsx` — "Bearbeiten"-MenuItem im Dropdown ergänzt
+- `[id]/page.tsx` — Edit-Button, verknüpfte Connections als Badges, Import von `useDataLakeConnections`
+
+### Ergebnis der Verifikation
+- Zeilenlimit 250: ✅ (AgentForm: 211, DetailPage: 196, EditPage: 75, NewPage: 47, AgentList: 125)
+- Imports korrekt: ✅ Checkbox-Komponente existiert und exportiert `Checkbox`
+- TypeScript-Typen: ✅ `DataLakeConnection`, `PROVIDER_LABELS` korrekt importiert
+- Runtime-Build: ⚠️ Nicht prüfbar (node_modules fehlt, `pnpm install` + `convex dev` erforderlich)
+
+### Neu hinzugefügte Aufgaben
+- Keine neuen Aufgaben
+
+### Empfohlene nächste Schritte
+1. AUFG-009: AGENTS.md/CLAUDE.md Dokumentation aktualisieren (MAINTENANCE_AGENT)
+2. AUFG-006: Zeitgesteuerte Agenten (Convex Scheduler / Cron)
+3. AUFG-002: Bugs in bestehenden Features (nach `convex dev` Runtime-Test)
+
+---
+
 ## Run #7 — 2026-04-17
 
 **Branch:** `claude/auto-coder` ✅

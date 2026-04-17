@@ -29,20 +29,34 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, Database } from "lucide-react";
+import type { DataLakeConnection } from "@/convex/datalake/_model/connection";
+import { PROVIDER_LABELS } from "@/convex/datalake/_model/connection";
 
 interface AgentFormProps {
   agent?: AIAgent | null;
+  dataLakeConnections: DataLakeConnection[];
   onSubmit: (data: CreateAgent) => Promise<void>;
   isLoading: boolean;
 }
 
-export function AgentForm({ agent, onSubmit, isLoading }: AgentFormProps) {
+export function AgentForm({ agent, dataLakeConnections, onSubmit, isLoading }: AgentFormProps) {
   const form = useForm<CreateAgent>({
     resolver: zodResolver(createAgentSchema),
     defaultValues: { ...defaultAgent, ...agent } as CreateAgent,
   });
+
+  const connections = form.watch("connections") ?? [];
+
+  const toggleConnection = (connectionRef: string) => {
+    if (connections.includes(connectionRef)) {
+      form.setValue("connections", connections.filter((c) => c !== connectionRef));
+    } else {
+      form.setValue("connections", [...connections, connectionRef]);
+    }
+  };
 
   useEffect(() => {
     if (agent) {
@@ -139,6 +153,48 @@ export function AgentForm({ agent, onSubmit, isLoading }: AgentFormProps) {
             />
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Database className="h-4 w-4" />
+              Data Lake Verbindungen
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {dataLakeConnections.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Keine Data Lake Verbindungen vorhanden. Erstelle zuerst eine Verbindung unter{" "}
+                <a href="/datalake" className="underline hover:text-foreground">Data Lake</a>.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {dataLakeConnections.map((conn) => {
+                  const ref = `datalake:${conn._id}`;
+                  return (
+                    <div key={conn._id} className="flex items-center gap-3">
+                      <Checkbox
+                        id={`conn-${conn._id}`}
+                        checked={connections.includes(ref)}
+                        onCheckedChange={() => toggleConnection(ref)}
+                      />
+                      <label
+                        htmlFor={`conn-${conn._id}`}
+                        className="flex flex-col cursor-pointer"
+                      >
+                        <span className="text-sm font-medium">{conn.name}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {PROVIDER_LABELS[conn.provider]}
+                        </span>
+                      </label>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         <div className="flex justify-end gap-4">
           <Button type="submit" disabled={isLoading}>
             {isLoading ? (

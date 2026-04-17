@@ -88,7 +88,7 @@ GitHub-Repository-Review-Tracking:
 ---
 
 ### [feature] AUFG-006: KI-Agenten-Portal
-**Status:** 🔄 Teilweise erledigt (Lauf #7)
+**Status:** 🔄 Teilweise erledigt (Lauf #9)
 **Agent:** FEATURE_AGENT
 **Abhängigkeit:** AUFG-001, AUFG-005
 
@@ -106,7 +106,9 @@ GitHub-Repository-Review-Tracking:
 - [x] Pages: /agenten, /agenten/new, /agenten/[id]
 - [x] Sidebar: KI-Agenten Link hinzugefügt
 - [x] Sicherheit: Agenten haben nur Lesezugriff auf Data Lake (kein Schreiben/Löschen)
-- [ ] Agenten-Verbindungen: UI zum Verknüpfen mit Data Lake Verbindungen — Folgeaufgabe
+- [x] Agenten-Verbindungen: UI zum Verknüpfen mit Data Lake Verbindungen — Lauf #9
+- [x] Edit-Page: /agenten/[id]/edit — Lauf #9
+- [x] Detail-Page: Verknüpfte Connections anzeigen + Edit-Button — Lauf #9
 - [ ] Zeitgesteuerte Agenten (Convex Scheduler / Cron) — Folgeaufgabe
 - [ ] Telegram Bot Integration (AUFG-007) für Agent-Steuerung
 

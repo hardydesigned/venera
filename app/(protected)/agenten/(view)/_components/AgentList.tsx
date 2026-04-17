@@ -99,6 +99,9 @@ export function AgentList({ agents, onDelete, onRun, isLoading, runningId }: Age
                     <DropdownMenuItem asChild>
                       <Link href={`/agenten/${agent._id}`}>Details</Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href={`/agenten/${agent._id}/edit`}>Bearbeiten</Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-destructive"
                       onClick={() => onDelete(agent._id)}

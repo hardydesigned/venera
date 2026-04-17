@@ -1,17 +1,18 @@
 "use client";
 
 import { use, useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, Loader2, Play, CheckCircle, XCircle, Clock } from "lucide-react";
+import { ArrowLeft, Loader2, Play, CheckCircle, XCircle, Clock, Pencil, Database } from "lucide-react";
 import { useAgent, useAgents } from "../../_controller/useAgents";
+import { useDataLakeConnections } from "@/app/(protected)/datalake/_controller/useDataLake";
 import type { Id } from "@/convex/_generated/dataModel";
 import type { AgentLog } from "@/convex/agents/_model/agent";
+import { PROVIDER_LABELS } from "@/convex/datalake/_model/connection";
 
 function LogStatusIcon({ status }: { status: AgentLog["status"] }) {
   if (status === "running") return <Clock className="h-4 w-4 text-blue-500 animate-pulse" />;
@@ -25,10 +26,10 @@ interface PageProps {
 
 export default function AgentDetailPage({ params }: PageProps) {
   const { id } = use(params);
-  const router = useRouter();
   const agentId = id as Id<"aiAgents">;
   const { agent, logs, isLoading } = useAgent(agentId);
   const { run } = useAgents();
+  const { connections: allConnections } = useDataLakeConnections();
   const [isRunning, setIsRunning] = useState(false);
 
   const handleRun = async () => {
@@ -60,6 +61,10 @@ export default function AgentDetailPage({ params }: PageProps) {
     );
   }
 
+  const linkedConnections = allConnections.filter((c) =>
+    (agent.connections ?? []).includes(`datalake:${c._id}`),
+  );
+
   return (
     <section className="flex h-full flex-col gap-6 p-4">
       <div className="flex items-center justify-between">
@@ -76,13 +81,21 @@ export default function AgentDetailPage({ params }: PageProps) {
             )}
           </div>
         </div>
-        <Button onClick={handleRun} disabled={isRunning}>
-          {isRunning ? (
-            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Läuft...</>
-          ) : (
-            <><Play className="mr-2 h-4 w-4" /> Jetzt ausführen</>
-          )}
-        </Button>
+        <div className="flex gap-2">
+          <Link href={`/agenten/${id}/edit`}>
+            <Button variant="outline">
+              <Pencil className="mr-2 h-4 w-4" />
+              Bearbeiten
+            </Button>
+          </Link>
+          <Button onClick={handleRun} disabled={isRunning}>
+            {isRunning ? (
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Läuft...</>
+            ) : (
+              <><Play className="mr-2 h-4 w-4" /> Jetzt ausführen</>
+            )}
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -111,6 +124,27 @@ export default function AgentDetailPage({ params }: PageProps) {
           </CardContent>
         </Card>
       </div>
+
+      {linkedConnections.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Database className="h-4 w-4" />
+              Verknüpfte Data Lake Verbindungen
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {linkedConnections.map((conn) => (
+                <Badge key={conn._id} variant="outline" className="gap-1">
+                  {conn.name}
+                  <span className="text-muted-foreground">· {PROVIDER_LABELS[conn.provider]}</span>
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

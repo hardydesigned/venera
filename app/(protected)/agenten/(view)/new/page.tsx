@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { AgentForm } from "../_components/AgentForm";
 import { useAgents } from "../../_controller/useAgents";
+import { useDataLakeConnections } from "@/app/(protected)/datalake/_controller/useDataLake";
 import type { CreateAgent } from "@/convex/agents/_model/agent";
 
 export default function NewAgentPage() {
   const router = useRouter();
   const { create, isLoading } = useAgents();
+  const { connections: dataLakeConnections } = useDataLakeConnections();
 
   const handleSubmit = async (data: CreateAgent) => {
     const { error } = await create(data);
@@ -35,7 +37,11 @@ export default function NewAgentPage() {
           <h1 className="text-3xl font-semibold tracking-tight">Neuer KI-Agent</h1>
         </div>
       </div>
-      <AgentForm onSubmit={handleSubmit} isLoading={isLoading} />
+      <AgentForm
+        onSubmit={handleSubmit}
+        isLoading={isLoading}
+        dataLakeConnections={dataLakeConnections}
+      />
     </section>
   );
 }
