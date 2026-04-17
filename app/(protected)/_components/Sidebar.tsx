@@ -11,6 +11,7 @@ import {
   FolderKanban,
   CalendarDays,
   GitDiff,
+  Users,
   LogOut,
 } from "lucide-react";
 
@@ -20,6 +21,7 @@ const navItems = [
   { href: "/projekte", label: "Projekte", icon: FolderKanban },
   { href: "/kalender", label: "Kalender", icon: CalendarDays },
   { href: "/code-diff", label: "Code Diff", icon: GitDiff },
+  { href: "/team", label: "Team", icon: Users },
 ];
 
 export function Sidebar() {

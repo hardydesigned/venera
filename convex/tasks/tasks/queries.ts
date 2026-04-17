@@ -17,19 +17,22 @@ export const listPersonal = query({
 
 /** Alle Aufgaben einer Organisation */
 export const listByOrg = query({
-  handler: async (ctx) => {
+  args: { orgId: v.id("organizations") },
+  handler: async (ctx, { orgId }) => {
     const { userId } = await requireAuth(ctx);
-    // orgId kommt aus dem Nutzer-Profil
-    const profile = await ctx.db
-      .query("userProfiles")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
-      .first();
 
-    if (!profile?.personalOrgId) return [];
+    // Zugriff nur für Org-Mitglieder
+    const membership = await ctx.db
+      .query("orgMemberships")
+      .withIndex("by_org_user", (q) =>
+        q.eq("orgId", orgId).eq("userId", userId),
+      )
+      .first();
+    if (!membership) return [];
 
     return ctx.db
       .query("tasks")
-      .withIndex("by_org", (q) => q.eq("orgId", profile.personalOrgId))
+      .withIndex("by_org", (q) => q.eq("orgId", orgId))
       .order("desc")
       .collect();
   },
@@ -41,7 +44,22 @@ export const get = query({
   handler: async (ctx, { id }) => {
     const { userId } = await requireAuth(ctx);
     const task = await ctx.db.get(id);
-    if (!task || task.userId !== userId) return null;
+    if (!task) return null;
+
+    // Persönliche Aufgabe: nur Owner
+    if (!task.orgId) {
+      if (task.userId !== userId) return null;
+      return task;
+    }
+
+    // Org-Aufgabe: Mitgliedschaft prüfen
+    const membership = await ctx.db
+      .query("orgMemberships")
+      .withIndex("by_org_user", (q) =>
+        q.eq("orgId", task.orgId!).eq("userId", userId),
+      )
+      .first();
+    if (!membership) return null;
     return task;
   },
 });

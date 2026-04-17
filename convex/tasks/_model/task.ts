@@ -23,7 +23,7 @@ export const createTaskSchema = z.object({
   startDate: z.number().optional(),
   projectId: z.string().optional(),
   assigneeId: z.string().optional(),
-  orgId: z.string().optional(),
+  orgId: z.string().optional(), // als String für Formulare, wird als Id genutzt
 });
 
 export type CreateTask = z.infer<typeof createTaskSchema>;

@@ -16,7 +16,7 @@ export default defineSchema({
   // Aufgaben (persönlich + Team)
   tasks: defineTable({
     userId: v.id("users"),
-    orgId: v.optional(v.string()),
+    orgId: v.optional(v.id("organizations")),
     title: v.string(),
     description: v.optional(v.string()),
     status: v.union(
@@ -86,4 +86,24 @@ export default defineSchema({
   })
     .index("by_repo", ["repoId"])
     .index("by_repo_path", ["repoId", "path"]),
+
+  // Organisationen (Team-Accounts)
+  organizations: defineTable({
+    name: v.string(),
+    slug: v.string(),
+    ownerId: v.id("users"),
+  })
+    .index("by_owner", ["ownerId"])
+    .index("by_slug", ["slug"]),
+
+  // Org-Mitgliedschaften
+  orgMemberships: defineTable({
+    orgId: v.id("organizations"),
+    userId: v.id("users"),
+    role: v.union(v.literal("owner"), v.literal("member")),
+    invitedBy: v.optional(v.id("users")),
+  })
+    .index("by_org", ["orgId"])
+    .index("by_user", ["userId"])
+    .index("by_org_user", ["orgId", "userId"]),
 });
