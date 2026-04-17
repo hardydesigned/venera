@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { FeedbackDialog } from "@/components/FeedbackDialog";
 import {
   LayoutDashboard,
   CheckSquare,
@@ -13,6 +14,7 @@ import {
   GitDiff,
   Users,
   Database,
+  Bot,
   LogOut,
 } from "lucide-react";
 
@@ -23,6 +25,7 @@ const navItems = [
   { href: "/kalender", label: "Kalender", icon: CalendarDays },
   { href: "/code-diff", label: "Code Diff", icon: GitDiff },
   { href: "/datalake", label: "Data Lake", icon: Database },
+  { href: "/agenten", label: "KI-Agenten", icon: Bot },
   { href: "/team", label: "Team", icon: Users },
 ];
 
@@ -58,7 +61,8 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="border-t p-4">
+      <div className="border-t p-4 space-y-1">
+        <FeedbackDialog />
         <Button
           variant="ghost"
           className="w-full justify-start gap-3 text-muted-foreground"

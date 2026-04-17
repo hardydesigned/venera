@@ -135,4 +135,45 @@ export default defineSchema({
   })
     .index("by_connection", ["connectionId"])
     .index("by_connection_path", ["connectionId", "path"]),
+
+  // Nutzer-Feedback (Feature-Wünsche + Problemmeldungen)
+  userFeedback: defineTable({
+    userId: v.id("users"),
+    type: v.union(v.literal("feature"), v.literal("bug"), v.literal("other")),
+    title: v.string(),
+    description: v.string(),
+    status: v.union(
+      v.literal("new"),
+      v.literal("in_review"),
+      v.literal("done"),
+    ),
+  })
+    .index("by_user", ["userId"])
+    .index("by_status", ["status"]),
+
+  // KI-Agenten
+  aiAgents: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    description: v.optional(v.string()),
+    prompt: v.string(),
+    schedule: v.optional(v.string()), // cron expression, z.B. "0 9 * * 1"
+    connections: v.array(v.string()), // IDs von dataLakeConnections oder "github:<repoId>"
+    isActive: v.boolean(),
+    lastRunAt: v.optional(v.number()),
+  }).index("by_user", ["userId"]),
+
+  // KI-Agenten Logs
+  agentLogs: defineTable({
+    agentId: v.id("aiAgents"),
+    startedAt: v.number(),
+    finishedAt: v.optional(v.number()),
+    status: v.union(
+      v.literal("running"),
+      v.literal("success"),
+      v.literal("error"),
+    ),
+    summary: v.optional(v.string()),
+    errorMessage: v.optional(v.string()),
+  }).index("by_agent", ["agentId"]),
 });

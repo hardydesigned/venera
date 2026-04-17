@@ -4,6 +4,62 @@ Chronologisches Protokoll aller Auto-Coder-Läufe.
 
 ---
 
+## Run #7 — 2026-04-17
+
+**Branch:** `claude/auto-coder` ✅
+**Agent:** FEATURE_AGENT
+**Grund:** Offene Aufgaben vorhanden → FEATURE_AGENT; AUFG-008 (Feedback-Dialog) und AUFG-006 (KI-Agenten-Portal) als nächste offene Aufgaben
+
+### Bearbeitete Hauptaufgaben
+- AUFG-008: Nutzer-Feedback-Dialog (vollständig)
+- AUFG-006: KI-Agenten-Portal (teilweise — Basis-Implementierung)
+
+### Kurzplan
+1. AUFG-008: Schema + Mutation + FeedbackDialog + Sidebar-Integration
+2. AUFG-006: Research LangChain.js (Context7), dann Schema + Backend + Frontend
+
+### Wichtigste Änderungen
+
+**AUFG-008 (komplett):**
+- `convex/feedback/_model/feedback.ts` — Zod-Schema, Typen
+- `convex/feedback/feedback/mutations.ts` — submit Mutation
+- `convex/feedback/feedback/queries.ts` — listMine Query
+- `components/FeedbackDialog.tsx` — Dialog (Feature/Bug/Sonstiges, Titel, Beschreibung)
+- `app/(protected)/_components/Sidebar.tsx` — FeedbackDialog-Button + KI-Agenten Link
+
+**AUFG-006 (Basis):**
+- `convex/schema.ts` — `aiAgents` + `agentLogs` + `userFeedback` Tabellen ergänzt
+- `convex/agents/_model/agent.ts` — Typen, Schema, SCHEDULE_OPTIONS
+- `convex/agents/agents/mutations.ts` — create, update, remove, setLastRun
+- `convex/agents/agents/queries.ts` — list, get
+- `convex/agents/logs/mutations.ts` — createLog, finishLog
+- `convex/agents/logs/queries.ts` — listByAgent
+- `convex/agents/run/actions.ts` — runAgent (Anthropic API, Data Lake Kontext)
+- `app/(protected)/agenten/_controller/useAgents.ts` — useAgents + useAgent Hooks
+- `app/(protected)/agenten/(view)/_components/AgentForm.tsx`
+- `app/(protected)/agenten/(view)/_components/AgentList.tsx`
+- `app/(protected)/agenten/(view)/page.tsx`
+- `app/(protected)/agenten/(view)/new/page.tsx`
+- `app/(protected)/agenten/(view)/[id]/page.tsx`
+- `components/ui/switch.tsx` — neu erstellt (fehlte, aber @radix-ui/react-switch war in package.json)
+
+### Ergebnis der Verifikation
+- Dateistruktur: ✅ Alle Dateien korrekt erstellt
+- API-Pfade: ✅ Manuell verifiziert (agents.agents.*, agents.logs.*, datalake.items.queries.listByConnection)
+- TypeScript Build: ⚠️ Nicht prüfbar (node_modules fehlt, `pnpm install` noch nicht ausgeführt)
+- Runtime: ⚠️ Nicht prüfbar ohne `convex dev`
+
+### Neu hinzugefügte Aufgaben
+- AUFG-006 Folgeaufgaben: Agent-Connections UI, Convex Cron Scheduler
+- AUFG-007 (Telegram Bot) bleibt offen als Abhängigkeit von AUFG-006
+
+### Empfohlene nächste Schritte
+1. AUFG-006 Folgeaufgaben: Agent-Connections UI (Data Lake Connections per UI verknüpfbar machen)
+2. AUFG-007: Telegram Bot Integration
+3. AUFG-009: AGENTS.md/CLAUDE.md Dokumentation aktualisieren
+
+---
+
 ## Run #6 — 2026-04-17
 
 **Branch:** `claude/auto-coder` ✅

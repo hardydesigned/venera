@@ -88,17 +88,27 @@ GitHub-Repository-Review-Tracking:
 ---
 
 ### [feature] AUFG-006: KI-Agenten-Portal
-**Status:** ⬜ Offen
+**Status:** 🔄 Teilweise erledigt (Lauf #7)
 **Agent:** FEATURE_AGENT
 **Abhängigkeit:** AUFG-001, AUFG-005
 
-- [ ] Recherche: LangChain.js Deep/Agent Framework (Context7 + Web)
-- [ ] Convex Schema: `aiAgents` (Name, Beschreibung, Zeitplan, Verbindungen, Prompt)
-- [ ] Seite: Agenten-Übersicht und -Konfiguration
-- [ ] Agenten-Verbindungen: Nextcloud/Storage (Lesen + Schreiben), GitHub (Lesen)
-- [ ] Zeitgesteuerte Agenten (Cron-basiert)
-- [ ] Agent-Logs anzeigen
-- [ ] Sicherheit: Keine Lösch-/Änderungsrechte für Agenten in externen Systemen
+- [x] Recherche: LangChain.js Deep/Agent Framework (Context7)
+- [x] Convex Schema: `aiAgents` + `agentLogs` Tabellen
+- [x] Backend: agents/mutations.ts (create, update, remove, setLastRun)
+- [x] Backend: agents/queries.ts (list, get)
+- [x] Backend: logs/mutations.ts (createLog, finishLog)
+- [x] Backend: logs/queries.ts (listByAgent)
+- [x] Backend: run/actions.ts — Anthropic API (Claude Haiku) mit Data Lake Kontext
+- [x] Frontend: useAgents + useAgent Hooks
+- [x] UI: AgentList (Karten mit Status, Zeitplan, Run-Button)
+- [x] UI: AgentForm (Name, Beschreibung, Prompt, Zeitplan, aktiv-Toggle)
+- [x] UI: Agent-Detailseite mit Logs (Status-Icons, Zusammenfassung)
+- [x] Pages: /agenten, /agenten/new, /agenten/[id]
+- [x] Sidebar: KI-Agenten Link hinzugefügt
+- [x] Sicherheit: Agenten haben nur Lesezugriff auf Data Lake (kein Schreiben/Löschen)
+- [ ] Agenten-Verbindungen: UI zum Verknüpfen mit Data Lake Verbindungen — Folgeaufgabe
+- [ ] Zeitgesteuerte Agenten (Convex Scheduler / Cron) — Folgeaufgabe
+- [ ] Telegram Bot Integration (AUFG-007) für Agent-Steuerung
 
 ---
 
@@ -115,13 +125,16 @@ GitHub-Repository-Review-Tracking:
 ---
 
 ### [feature] AUFG-008: Nutzer-Feedback-Dialog
-**Status:** ⬜ Offen
+**Status:** ✅ Erledigt (Lauf #7)
 **Agent:** FEATURE_AGENT
 **Abhängigkeit:** AUFG-001
 
-- [ ] Dialog-Komponente: Feature-Wunsch / Feedback eingeben
-- [ ] Convex Mutation: Feedback speichern
-- [ ] Optional: Automatischer GitHub-Issue oder E-Mail an Developer
+- [x] Convex Schema: `userFeedback` Tabelle (type, title, description, status)
+- [x] Convex Mutation: `submit` (feedback/feedback/mutations.ts)
+- [x] Convex Query: `listMine` (eigene Feedbacks abrufen)
+- [x] `components/FeedbackDialog.tsx` — Dialog mit Typ (Feature/Bug/Sonstiges), Titel, Beschreibung
+- [x] Sidebar: Feedback-Button im unteren Bereich hinzugefügt
+- [ ] Optional: Automatischer GitHub-Issue oder E-Mail an Developer — als Folgeaufgabe
 
 ---
 

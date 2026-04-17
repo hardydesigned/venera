@@ -9,6 +9,8 @@ Kompakte Erinnerung für zukünftige Läufe. Enthält wichtige Erkenntnisse, sen
 - [Code Diff Feature](memory/code-diff.md) — GitHub Repository Review-Tracking, SHA-Change-Detection, Sync-Action
 - [Team / Org Feature](memory/team-org.md) — Organisations- und Team-Verwaltung, Mitglieder, Org-Tasks
 - [Data Lake Feature](memory/data-lake.md) — Nextcloud/WebDAV Integration, Storage-Abstraction, File-Browser
+- [KI-Agenten Portal](memory/ai-agents.md) — Anthropic API, Convex Actions, Agent-Logs, Data Lake Kontext
+- [Feedback Dialog](memory/feedback-dialog.md) — Nutzer-Feedback-Dialog, Sidebar-Integration, Convex-Backend
 
 ## Aktueller Projektstatus (Stand: 2026-04-17)
 
@@ -66,6 +68,16 @@ Kompakte Erinnerung für zukünftige Läufe. Enthält wichtige Erkenntnisse, sen
 - Convex Auth Middleware: Package-Name ist `@convex-dev/auth/nextjs/server`
 - `convex/_generated/` fehlt noch (wird durch `convex dev` erstellt) — Build nicht möglich ohne
 - Inbox Edit-Page nutzt React 19 `use(params)` für async params
+
+### Erkenntnisse aus Lauf #7 (2026-04-17)
+- AUFG-008 vollständig erledigt: Feedback-Dialog (Schema, Mutation, Query, FeedbackDialog-Komponente, Sidebar-Button)
+- AUFG-006 teilweise erledigt: KI-Agenten-Portal (Schema, Backend, Frontend, Sidebar-Link)
+- `components/ui/switch.tsx` erstellt (war fehlend, @radix-ui/react-switch war bereits in package.json)
+- KI-Agenten nutzen direkte Anthropic API in Convex Actions (`"use node"`) — kein LangChain nötig für Basisfälle
+- Modell: `claude-haiku-4-5-20251001` für Agenten (schnell + kostengünstig)
+- `ANTHROPIC_API_KEY` muss als Convex Env-Variable gesetzt werden
+- Agenten-Sicherheit: nur Lesezugriff auf Data Lake (listByConnection), kein Schreiben/Löschen
+- Nächste Priorität: AUFG-006 Folgeaufgaben (Agent-Connections UI, Cron Scheduler) oder AUFG-007 (Telegram Bot)
 
 ### Erkenntnisse aus Lauf #6 (2026-04-17)
 - AUFG-005 teilweise implementiert: Data Lake Integration (Nextcloud WebDAV)
