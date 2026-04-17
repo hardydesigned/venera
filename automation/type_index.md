@@ -58,6 +58,19 @@ Bevor ein neuer Typ erstellt wird, bitte hier nachschauen!
 | `OrgFormData` | convex/organizations/_model/organization.ts | Formular-Schema |
 | `OrgMemberWithUser` | convex/organizations/_model/organization.ts | Mitglied + User-Details für UI |
 
+## Data Lake
+
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `DataLakeConnection` | convex/datalake/_model/connection.ts | `Doc<"dataLakeConnections">` — Storage-Verbindung |
+| `Provider` | convex/datalake/_model/connection.ts | `"nextcloud" \| "onedrive" \| "googledrive"` |
+| `CreateConnection` | convex/datalake/_model/connection.ts | Input-Schema für create Mutation |
+| `ConnectionFormData` | convex/datalake/_model/connection.ts | Formular-Schema |
+| `PROVIDER_LABELS` | convex/datalake/_model/connection.ts | Record<Provider, string> — Anzeigenamen |
+| `DataLakeItem` | convex/datalake/_model/item.ts | `Doc<"dataLakeItems">` — gecachtes Datei/Ordner-Item |
+| `ItemType` | convex/datalake/_model/item.ts | `"file" \| "folder"` |
+| `SyncItem` | convex/datalake/_model/item.ts | Interface für WebDAV-geparste Einträge |
+
 ## UI
 
 | Typ | Datei | Beschreibung |

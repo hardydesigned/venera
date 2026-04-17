@@ -65,15 +65,25 @@ GitHub-Repository-Review-Tracking:
 ---
 
 ### [feature] AUFG-005: Data Lake Integration (Nextcloud)
-**Status:** ⬜ Offen
+**Status:** 🔄 Teilweise erledigt (Lauf #6)
 **Agent:** FEATURE_AGENT
 **Abhängigkeit:** AUFG-001
 
-- [ ] Nextcloud API Integration (WebDAV)
-- [ ] Abstraktionslayer für austauschbaren Storage (Nextcloud / OneDrive / Google Drive)
-- [ ] Seite: Datei-Übersicht mit Vorschau/Link
-- [ ] Seite: Verschiedene Daten-Kategorien (Ideen, Marketing, etc.)
-- [ ] Dateien im Browser anzeigen
+- [x] Nextcloud API Integration (WebDAV PROPFIND) — Convex Action `syncFromNextcloud`
+- [x] Abstraktionslayer für austauschbaren Storage (Provider-Enum: nextcloud/onedrive/googledrive)
+- [x] Convex Schema: `dataLakeConnections` + `dataLakeItems` mit Indizes
+- [x] Backend: connections/queries.ts (list, get) + mutations.ts (create, update, remove, setLastSync)
+- [x] Backend: items/queries.ts (listByConnection) + mutations.ts (bulkSync)
+- [x] Backend: sync/actions.ts — WebDAV XML-Parsing, PROPFIND, Cascade-Sync
+- [x] Frontend: useDataLakeConnections + useDataLakeConnection Hooks
+- [x] UI: ConnectionList (Karten mit Sync-Button, Provider-Badge)
+- [x] UI: ConnectionForm (Name, Anbieter, WebDAV-URL, Username, Passwort)
+- [x] UI: FileList (Suche, Ordner/Datei-Icons, Größe, Datum)
+- [x] Pages: /datalake, /datalake/new, /datalake/[connectionId]
+- [x] Sidebar: Data Lake Link hinzugefügt
+- [ ] Dateien im Browser öffnen (authentifizierter Proxy oder direkte Verlinkung) — Folgeaufgabe
+- [ ] Kategorien-Ansicht (Ideen, Marketing etc.) — Folgeaufgabe
+- [ ] OneDrive + Google Drive Provider implementieren (nur Nextcloud/WebDAV aktiv) — Folgeaufgabe
 
 ---
 

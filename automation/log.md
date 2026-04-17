@@ -4,6 +4,65 @@ Chronologisches Protokoll aller Auto-Coder-Läufe.
 
 ---
 
+## Run #6 — 2026-04-17
+
+**Branch:** `claude/auto-coder` ✅
+**Agent:** FEATURE_AGENT
+**Grund:** Offene Aufgaben vorhanden → FEATURE_AGENT; AUFG-005 (Data Lake Integration) als nächste offene Aufgabe
+
+### Bearbeitete Hauptaufgabe
+AUFG-005: Data Lake Integration — Nextcloud/WebDAV Storage-Anbindung
+
+### Kurzplan
+1. Schema: `dataLakeConnections` + `dataLakeItems` Tabellen
+2. Backend: connection mutations/queries + item mutations/queries
+3. Backend: Convex Action `syncFromNextcloud` (WebDAV PROPFIND + XML-Parse)
+4. Frontend: useDataLakeConnections + useDataLakeConnection Hooks
+5. UI: ConnectionList, ConnectionForm, FileList Komponenten
+6. Pages: /datalake, /datalake/new, /datalake/[connectionId]
+7. Sidebar: Data Lake Link hinzufügen
+
+### Wichtigste Änderungen
+
+**Neu angelegt:**
+- `convex/datalake/_model/connection.ts` — Provider-Enum, Zod-Schema, Typen, PROVIDER_LABELS
+- `convex/datalake/_model/item.ts` — DataLakeItem, SyncItem, formatFileSize()
+- `convex/datalake/connections/queries.ts` — list, get
+- `convex/datalake/connections/mutations.ts` — create, update, remove (Cascade), setLastSync
+- `convex/datalake/items/queries.ts` — listByConnection
+- `convex/datalake/items/mutations.ts` — bulkSync (delete all + reinsert)
+- `convex/datalake/sync/actions.ts` — syncFromNextcloud ("use node", Buffer, Regex-XML-Parser)
+- `app/(protected)/datalake/_controller/useDataLake.ts` — useDataLakeConnections + useDataLakeConnection
+- `app/(protected)/datalake/(view)/_components/ConnectionList.tsx` — Verbindungskarten
+- `app/(protected)/datalake/(view)/_components/ConnectionForm.tsx` — Verbindungsformular
+- `app/(protected)/datalake/(view)/_components/FileList.tsx` — Datei-Browser mit Suche
+- `app/(protected)/datalake/(view)/page.tsx` — Übersicht + Delete-Dialog
+- `app/(protected)/datalake/(view)/new/page.tsx` — Neue Verbindung
+- `app/(protected)/datalake/(view)/[connectionId]/page.tsx` — Datei-Ansicht + Sync-Button
+- `automation/memory/data-lake.md` — Feature-Memory
+
+**Geändert:**
+- `convex/schema.ts` — dataLakeConnections + dataLakeItems Tabellen mit Indizes
+- `app/(protected)/_components/Sidebar.tsx` — Data Lake Link + Database-Icon
+
+### Verifikation
+- **Dateilängen:** Alle Dateien unter 250 Zeilen ✅
+- **"use node"** direktive in sync/actions.ts für Buffer-API ✅
+- **Cascade Delete:** remove-Mutation löscht alle dataLakeItems einer Connection ✅
+- **Security:** requireAuth() in allen Queries/Mutations ✅
+- **Build-Prüfung:** Keine `convex dev` möglich (erfordert laufendes Convex-Projekt)
+
+### Neu hinzugefügte Aufgaben
+- AUFG-005 Folge: Datei-Browser mit Auth-Proxy für Nextcloud-Dateien im Browser
+- AUFG-005 Folge: OneDrive + Google Drive Provider implementieren
+- AUFG-005 Folge: Kategorien-Ansicht (Tag-basiert oder Ordner-Filter)
+
+### Empfohlene nächste Schritte
+- AUFG-008 (Feedback-Dialog) — kleinste abgeschlossene Aufgabe, schnell umsetzbar
+- AUFG-006 (KI-Agenten-Portal) — Context7-Recherche LangChain.js Deep Agent Framework
+
+---
+
 ## Run #5 — 2026-04-17
 
 **Branch:** `claude/auto-coder` ✅

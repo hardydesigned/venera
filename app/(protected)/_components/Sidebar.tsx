@@ -12,6 +12,7 @@ import {
   CalendarDays,
   GitDiff,
   Users,
+  Database,
   LogOut,
 } from "lucide-react";
 
@@ -21,6 +22,7 @@ const navItems = [
   { href: "/projekte", label: "Projekte", icon: FolderKanban },
   { href: "/kalender", label: "Kalender", icon: CalendarDays },
   { href: "/code-diff", label: "Code Diff", icon: GitDiff },
+  { href: "/datalake", label: "Data Lake", icon: Database },
   { href: "/team", label: "Team", icon: Users },
 ];
 

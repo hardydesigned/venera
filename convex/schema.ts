@@ -106,4 +106,33 @@ export default defineSchema({
     .index("by_org", ["orgId"])
     .index("by_user", ["userId"])
     .index("by_org_user", ["orgId", "userId"]),
+
+  // Data Lake: Storage-Verbindungen (Nextcloud, OneDrive, etc.)
+  dataLakeConnections: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    provider: v.union(
+      v.literal("nextcloud"),
+      v.literal("onedrive"),
+      v.literal("googledrive"),
+    ),
+    webdavUrl: v.optional(v.string()),
+    username: v.optional(v.string()),
+    password: v.optional(v.string()),
+    lastSyncAt: v.optional(v.number()),
+  }).index("by_user", ["userId"]),
+
+  // Data Lake: Gecachte Datei/Ordner-Einträge
+  dataLakeItems: defineTable({
+    connectionId: v.id("dataLakeConnections"),
+    path: v.string(),
+    name: v.string(),
+    type: v.union(v.literal("file"), v.literal("folder")),
+    size: v.optional(v.number()),
+    lastModified: v.optional(v.number()),
+    contentType: v.optional(v.string()),
+    etag: v.optional(v.string()),
+  })
+    .index("by_connection", ["connectionId"])
+    .index("by_connection_path", ["connectionId", "path"]),
 });

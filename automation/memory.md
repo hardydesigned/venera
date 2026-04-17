@@ -8,6 +8,7 @@ Kompakte Erinnerung für zukünftige Läufe. Enthält wichtige Erkenntnisse, sen
 - [Inbox / Tasks Feature](memory/inbox-tasks.md) — Aufgabenverwaltung (CRUD) mit Convex + React Hook Form
 - [Code Diff Feature](memory/code-diff.md) — GitHub Repository Review-Tracking, SHA-Change-Detection, Sync-Action
 - [Team / Org Feature](memory/team-org.md) — Organisations- und Team-Verwaltung, Mitglieder, Org-Tasks
+- [Data Lake Feature](memory/data-lake.md) — Nextcloud/WebDAV Integration, Storage-Abstraction, File-Browser
 
 ## Aktueller Projektstatus (Stand: 2026-04-17)
 
@@ -65,6 +66,16 @@ Kompakte Erinnerung für zukünftige Läufe. Enthält wichtige Erkenntnisse, sen
 - Convex Auth Middleware: Package-Name ist `@convex-dev/auth/nextjs/server`
 - `convex/_generated/` fehlt noch (wird durch `convex dev` erstellt) — Build nicht möglich ohne
 - Inbox Edit-Page nutzt React 19 `use(params)` für async params
+
+### Erkenntnisse aus Lauf #6 (2026-04-17)
+- AUFG-005 teilweise implementiert: Data Lake Integration (Nextcloud WebDAV)
+- Schema: `dataLakeConnections` + `dataLakeItems` Tabellen neu
+- Convex Action `syncFromNextcloud` nutzt `"use node"` für Node.js `Buffer`-API
+- WebDAV PROPFIND XML wird per Regex geparst (kein XML-Parser nötig)
+- API-Pfade: `api.datalake.connections.queries.*`, `api.datalake.items.*`, `api.datalake.sync.actions.*`
+- Provider-Enum: `nextcloud | onedrive | googledrive` — nur Nextcloud implementiert
+- Noch offen: Datei-Browser (auth. Proxy), Kategorien-Ansicht, weitere Provider
+- Nächste Priorität: AUFG-008 (Feedback-Dialog) oder AUFG-006 (KI-Agenten recherchieren)
 
 ### Erkenntnisse aus Lauf #5 (2026-04-17)
 - AUFG-004 vollständig implementiert: Org-Verwaltung + Team-Aufgaben

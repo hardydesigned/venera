@@ -138,6 +138,43 @@ Bevor eine neue Funktion implementiert wird, bitte hier nachschauen!
 |----------|----------|-------------|
 | `syncRepoFromGitHub` | api.codediff.sync.actions.syncRepoFromGitHub | GitHub Trees API abrufen + DB updaten |
 
+## Hooks — Data Lake
+
+| Hook | Datei | Beschreibung |
+|------|-------|-------------|
+| `useDataLakeConnections()` | app/(protected)/datalake/_controller/useDataLake.ts | Verbindungen laden + create + remove + sync |
+| `useDataLakeConnection(id)` | app/(protected)/datalake/_controller/useDataLake.ts | Einzelne Verbindung + ihre Items |
+
+## Convex Queries — Data Lake
+
+| Funktion | API-Pfad | Beschreibung |
+|----------|----------|-------------|
+| `list` | api.datalake.connections.queries.list | Alle Verbindungen des Users |
+| `get` | api.datalake.connections.queries.get | Einzelne Verbindung per ID |
+| `listByConnection` | api.datalake.items.queries.listByConnection | Alle Items einer Verbindung |
+
+## Convex Mutations — Data Lake
+
+| Funktion | API-Pfad | Beschreibung |
+|----------|----------|-------------|
+| `create` | api.datalake.connections.mutations.create | Verbindung erstellen |
+| `update` | api.datalake.connections.mutations.update | Verbindung aktualisieren |
+| `remove` | api.datalake.connections.mutations.remove | Verbindung + Items löschen (Cascade) |
+| `setLastSync` | api.datalake.connections.mutations.setLastSync | lastSyncAt auf now() setzen |
+| `bulkSync` | api.datalake.items.mutations.bulkSync | Alle Items ersetzen (delete all + reinsert) |
+
+## Convex Actions — Data Lake
+
+| Funktion | API-Pfad | Beschreibung |
+|----------|----------|-------------|
+| `syncFromNextcloud` | api.datalake.sync.actions.syncFromNextcloud | WebDAV PROPFIND + XML-Parse + bulkSync |
+
+## Utilities — Data Lake
+
+| Funktion | Datei | Beschreibung |
+|----------|-------|-------------|
+| `formatFileSize(bytes)` | convex/datalake/_model/item.ts | Bytes → human-readable (B/KB/MB/GB) |
+
 ## Komponenten
 
 | Komponente | Datei | Beschreibung |
@@ -153,3 +190,6 @@ Bevor eine neue Funktion implementiert wird, bitte hier nachschauen!
 | `RepoForm` | app/(protected)/code-diff/(view)/_components/RepoForm.tsx | Formular zum Repository hinzufügen |
 | `FileTree` | app/(protected)/code-diff/(view)/_components/FileTree.tsx | Hierarchischer Dateibaum mit Status-Badges |
 | `OrgForm` | app/(protected)/team/(view)/_components/OrgForm.tsx | Formular für Org erstellen (name + slug) |
+| `ConnectionList` | app/(protected)/datalake/(view)/_components/ConnectionList.tsx | Storage-Verbindungskarten mit Sync-Button |
+| `ConnectionForm` | app/(protected)/datalake/(view)/_components/ConnectionForm.tsx | Formular für Verbindung hinzufügen |
+| `FileList` | app/(protected)/datalake/(view)/_components/FileList.tsx | Datei-Browser mit Suche, Icons, Größe/Datum |
