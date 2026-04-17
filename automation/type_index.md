@@ -71,6 +71,29 @@ Bevor ein neuer Typ erstellt wird, bitte hier nachschauen!
 | `ItemType` | convex/datalake/_model/item.ts | `"file" \| "folder"` |
 | `SyncItem` | convex/datalake/_model/item.ts | Interface für WebDAV-geparste Einträge |
 
+## KI-Agenten
+
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `AIAgent` | convex/agents/_model/agent.ts | `Doc<"aiAgents">` — KI-Agent Dokument |
+| `AgentLog` | convex/agents/_model/agent.ts | `Doc<"agentLogs">` — Ausführungs-Log |
+| `AgentConnectionType` | convex/agents/_model/agent.ts | `"datalake" \| "github"` |
+| `CreateAgent` | convex/agents/_model/agent.ts | Input-Schema für create/update Mutations |
+| `SCHEDULE_OPTIONS` | convex/agents/_model/agent.ts | Array mit Cron-Zeitplan-Optionen |
+
+## Telegram Bot
+
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `TelegramSettings` | convex/telegram/_model/telegram.ts | `Doc<"telegramSettings">` — Bot-Einstellungen |
+| `TelegramSettingsData` | convex/telegram/_model/telegram.ts | Formular-Schema für Bot-Konfiguration |
+
+## Feedback
+
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `UserFeedback` | convex/feedback/_model/feedback.ts | `Doc<"userFeedback">` — Nutzer-Feedback Dokument |
+
 ## UI
 
 | Typ | Datei | Beschreibung |

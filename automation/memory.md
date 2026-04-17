@@ -3,6 +3,7 @@
 Kompakte Erinnerung für zukünftige Läufe. Enthält wichtige Erkenntnisse, sensible Stellen und Kontext.
 
 ## Index der Feature-Memory-Dateien
+- [Telegram Bot Feature](memory/telegram-bot.md) — Telegram Bot Integration, Webhook-Setup, Commands, requireAuth ActionCtx
 - [Next.js + Convex Migration](memory/migration-convex.md) — Grundlegende Migration von Java+Svelte zu Next.js+Convex
 - [Convex Auth Setup](memory/convex-auth.md) — Authentifizierung mit @convex-dev/auth statt Clerk
 - [Inbox / Tasks Feature](memory/inbox-tasks.md) — Aufgabenverwaltung (CRUD) mit Convex + React Hook Form
@@ -68,6 +69,16 @@ Kompakte Erinnerung für zukünftige Läufe. Enthält wichtige Erkenntnisse, sen
 - Convex Auth Middleware: Package-Name ist `@convex-dev/auth/nextjs/server`
 - `convex/_generated/` fehlt noch (wird durch `convex dev` erstellt) — Build nicht möglich ohne
 - Inbox Edit-Page nutzt React 19 `use(params)` für async params
+
+### Erkenntnisse aus Lauf #8 (2026-04-17)
+- AUFG-007 vollständig implementiert: Telegram Bot Integration
+- Schema: `telegramSettings` Tabelle neu in schema.ts
+- `convex/lib/auth.ts` → `requireAuth` jetzt für `QueryCtx | MutationCtx | ActionCtx` (vorher fehlte ActionCtx-Support)
+- Webhook-Architektur: HTTP POST /telegram/webhook → handleWebhook → `internal.telegram.bot.queries.getByChatId` → `internal.agents.agents.queries.listByUser`
+- Interne Queries (`internalQuery`) werden für den unauthentifizierten Webhook-Handler benötigt
+- Telegram-Befehle: /start, /help, /list, /run <Name>, /status
+- Sicherheit: Nur autorisierte Chat-IDs können den Bot steuern (Lookup via by_chat Index)
+- Nächste Priorität: AUFG-009 (Dokumentation) oder weitere AUFG-006 Folgeaufgaben (Agent-Connections UI, Cron Scheduler)
 
 ### Erkenntnisse aus Lauf #7 (2026-04-17)
 - AUFG-008 vollständig erledigt: Feedback-Dialog (Schema, Mutation, Query, FeedbackDialog-Komponente, Sidebar-Button)

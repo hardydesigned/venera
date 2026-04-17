@@ -175,6 +175,53 @@ Bevor eine neue Funktion implementiert wird, bitte hier nachschauen!
 |----------|-------|-------------|
 | `formatFileSize(bytes)` | convex/datalake/_model/item.ts | Bytes → human-readable (B/KB/MB/GB) |
 
+## Hooks — KI-Agenten
+
+| Hook | Datei | Beschreibung |
+|------|-------|-------------|
+| `useAgents()` | app/(protected)/agenten/_controller/useAgents.ts | Agenten laden + create + update + remove + run |
+| `useAgent(id)` | app/(protected)/agenten/_controller/useAgents.ts | Einzelner Agent + seine Logs |
+| `useTelegram()` | app/(protected)/agenten/_controller/useTelegram.ts | Telegram-Einstellungen + save + remove + webhook-Register |
+
+## Convex Queries — KI-Agenten
+
+| Funktion | API-Pfad | Beschreibung |
+|----------|----------|-------------|
+| `list` | api.agents.agents.queries.list | Alle Agenten des Users |
+| `get` | api.agents.agents.queries.get | Einzelner Agent per ID |
+| `listByUser` | internal.agents.agents.queries.listByUser | **Intern** — Agenten per userId (für Webhook) |
+| `listByAgent` | api.agents.logs.queries.listByAgent | Logs eines Agenten (letzte 20) |
+
+## Convex Mutations — KI-Agenten
+
+| Funktion | API-Pfad | Beschreibung |
+|----------|----------|-------------|
+| `create` | api.agents.agents.mutations.create | Agent erstellen |
+| `update` | api.agents.agents.mutations.update | Agent aktualisieren |
+| `remove` | api.agents.agents.mutations.remove | Agent + Logs löschen (Cascade) |
+| `setLastRun` | api.agents.agents.mutations.setLastRun | lastRunAt auf now() setzen |
+| `createLog` | api.agents.logs.mutations.createLog | Log-Eintrag anlegen (status: running) |
+| `finishLog` | api.agents.logs.mutations.finishLog | Log abschließen (success/error) |
+
+## Convex Actions — KI-Agenten
+
+| Funktion | API-Pfad | Beschreibung |
+|----------|----------|-------------|
+| `runAgent` | api.agents.run.actions.runAgent | Agent ausführen (Anthropic API + Data Lake) |
+
+## Convex Queries / Mutations / Actions — Telegram Bot
+
+| Funktion | API-Pfad | Beschreibung |
+|----------|----------|-------------|
+| `getMine` | api.telegram.bot.queries.getMine | Eigene Bot-Einstellungen laden |
+| `getByChatId` | internal.telegram.bot.queries.getByChatId | **Intern** — Einstellungen per Chat-ID (für Webhook) |
+| `upsertSettings` | api.telegram.bot.mutations.upsertSettings | Bot-Token + Chat-ID speichern (create/update) |
+| `setWebhookRegistered` | api.telegram.bot.mutations.setWebhookRegistered | Webhook-Status aktualisieren |
+| `removeSettings` | api.telegram.bot.mutations.removeSettings | Bot-Verbindung entfernen |
+| `registerWebhook` | api.telegram.bot.actions.registerWebhook | Telegram Webhook bei Telegram API registrieren |
+| `removeWebhook` | api.telegram.bot.actions.removeWebhook | Telegram Webhook deregistrieren |
+| `handleWebhook` | HTTP POST /telegram/webhook | Eingehende Telegram-Updates verarbeiten |
+
 ## Komponenten
 
 | Komponente | Datei | Beschreibung |

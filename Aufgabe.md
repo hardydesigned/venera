@@ -113,14 +113,25 @@ GitHub-Repository-Review-Tracking:
 ---
 
 ### [feature] AUFG-007: Telegram Bot Integration
-**Status:** ⬜ Offen
+**Status:** ✅ Erledigt (Lauf #8)
 **Agent:** FEATURE_AGENT
 **Abhängigkeit:** AUFG-006
 
-- [ ] Telegram Bot API Integration
-- [ ] Agenten via Telegram starten/stoppen
-- [ ] Status-Updates via Telegram
-- [ ] Chat mit Agenten via Telegram
+- [x] Convex Schema: `telegramSettings` Tabelle (botToken, authorizedChatId, webhookRegistered)
+- [x] Backend: `convex/telegram/_model/telegram.ts` — Zod-Schema + Typen
+- [x] Backend: `convex/telegram/bot/queries.ts` — getMine + getByChatId (internalQuery)
+- [x] Backend: `convex/telegram/bot/mutations.ts` — upsertSettings, setWebhookRegistered, removeSettings
+- [x] Backend: `convex/telegram/bot/actions.ts` — registerWebhook, removeWebhook (Telegram API)
+- [x] Backend: `convex/telegram/webhook/actions.ts` — handleWebhook HTTP-Action
+- [x] Backend: `convex/agents/agents/queries.ts` — listByUser (internalQuery für Webhook)
+- [x] Backend: `convex/http.ts` — POST /telegram/webhook Route registriert
+- [x] Backend: `convex/lib/auth.ts` — requireAuth für ActionCtx erweitert
+- [x] Frontend: `useTelegram()` Hook — save, remove, registerWebhook, removeWebhook
+- [x] UI: `/agenten/telegram` — Setup-Anleitung, Token-Eingabe, Chat-ID, Webhook-Management
+- [x] Sidebar: Telegram Bot Link hinzugefügt
+- [x] Befehle: /start, /help, /list, /run <Name>, /status
+- [ ] Telegram-Benachrichtigung nach Agent-Run (Push-Notification) — Folgeaufgabe
+- [ ] /stop Befehl (laufenden Agenten abbrechen) — Folgeaufgabe
 
 ---
 

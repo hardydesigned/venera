@@ -409,3 +409,56 @@ Keine neuen Aufgaben in diesem Lauf.
 ### Empfohlene nächste Schritte
 1. **Manuell**: `pnpm install` + `npx convex dev` für Runtime-Prüfung
 2. **Run #5**: AUFG-004 (Persönliche & Team To-dos) implementieren
+
+---
+
+## Run #8 — 2026-04-17
+
+**Branch:** `claude/auto-coder` ✅
+**Agent:** FEATURE_AGENT
+**Grund:** Offene Aufgaben vorhanden → FEATURE_AGENT; AUFG-007 (Telegram Bot) als nächste vollständig offene Aufgabe
+
+### Bearbeitete Hauptaufgabe
+AUFG-007: Telegram Bot Integration (vollständig)
+
+### Kurzplan
+1. Schema: `telegramSettings` Tabelle ergänzen
+2. Backend: Telegram Model, Queries (inkl. internalQuery), Mutations, Actions
+3. Backend: internalQuery `listByUser` zu agents/queries hinzufügen
+4. Backend: HTTP-Webhook-Handler, http.ts Route registrieren
+5. Backend: requireAuth für ActionCtx erweitern
+6. Frontend: useTelegram Hook + Telegram-Settings-Page
+7. Sidebar: Telegram Bot Link hinzufügen
+8. Indizes: type_index.md + function_index.md aktualisieren
+
+### Wichtigste Änderungen
+
+- `convex/schema.ts` — `telegramSettings` Tabelle (by_user + by_chat Indizes)
+- `convex/lib/auth.ts` — `requireAuth` jetzt für `QueryCtx | MutationCtx | ActionCtx`
+- `convex/telegram/_model/telegram.ts` — Zod-Schema, TelegramSettings-Typ
+- `convex/telegram/bot/queries.ts` — getMine (query) + getByChatId (internalQuery)
+- `convex/telegram/bot/mutations.ts` — upsertSettings, setWebhookRegistered, removeSettings
+- `convex/telegram/bot/actions.ts` — registerWebhook, removeWebhook ("use node")
+- `convex/telegram/webhook/actions.ts` — handleWebhook (httpAction, /start, /list, /run, /status)
+- `convex/agents/agents/queries.ts` — listByUser (internalQuery für Webhook-Handler)
+- `convex/http.ts` — POST /telegram/webhook Route hinzugefügt
+- `app/(protected)/agenten/_controller/useTelegram.ts` — useTelegram() Hook
+- `app/(protected)/agenten/(view)/telegram/page.tsx` — Setup-Anleitung + Konfigurationsformular
+- `app/(protected)/_components/Sidebar.tsx` — Telegram Bot Link ergänzt
+
+### Ergebnis der Verifikation
+- Dateistruktur: ✅ Alle Dateien korrekt erstellt
+- Zeilenlimits: ✅ Alle Dateien < 250 Zeilen
+- API-Pfade: ✅ Manuell verifiziert (telegram.bot.*, agents.agents.queries.listByUser)
+- HTTP-Route: ✅ POST /telegram/webhook in http.ts registriert
+- TypeScript Build: ⚠️ Nicht prüfbar (node_modules fehlt, `pnpm install` ausstehend)
+- Runtime: ⚠️ Nicht prüfbar ohne `convex dev`
+
+### Neu hinzugefügte Aufgaben
+- Telegram Push-Benachrichtigung nach Agent-Run (proaktiv)
+- /stop Befehl für Telegram
+
+### Empfohlene nächste Schritte
+1. AUFG-006 Folgeaufgaben: Agent-Connections UI (Data Lake Verbindungen per UI verknüpfen)
+2. AUFG-009: Dokumentation (AGENTS.md/CLAUDE.md) aktualisieren
+3. SECURITY_AGENT: Security Review aller Endpoints (nach FEATURE-Abschluss)

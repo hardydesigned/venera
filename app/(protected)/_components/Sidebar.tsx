@@ -15,6 +15,7 @@ import {
   Users,
   Database,
   Bot,
+  Send,
   LogOut,
 } from "lucide-react";
 
@@ -26,6 +27,7 @@ const navItems = [
   { href: "/code-diff", label: "Code Diff", icon: GitDiff },
   { href: "/datalake", label: "Data Lake", icon: Database },
   { href: "/agenten", label: "KI-Agenten", icon: Bot },
+  { href: "/agenten/telegram", label: "Telegram Bot", icon: Send },
   { href: "/team", label: "Team", icon: Users },
 ];
 

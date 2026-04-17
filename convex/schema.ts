@@ -176,4 +176,15 @@ export default defineSchema({
     summary: v.optional(v.string()),
     errorMessage: v.optional(v.string()),
   }).index("by_agent", ["agentId"]),
+
+  // Telegram Bot Einstellungen
+  telegramSettings: defineTable({
+    userId: v.id("users"),
+    botToken: v.string(),
+    authorizedChatId: v.string(),
+    webhookRegistered: v.boolean(),
+    lastMessageAt: v.optional(v.number()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_chat", ["authorizedChatId"]),
 });
