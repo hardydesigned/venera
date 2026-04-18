@@ -1,131 +1,71 @@
-# Venera
+# Venera – Next.js App
 
-Eine produktive To-Do-, Projekt- und Kalender-App mit Svelte-Frontend und Spring-Boot-Backend.
+## Tech Stack
 
-## Tech-Stack
+- **Frontend**: Next.js 16 (App Router) + React 19
+- **Backend**: Convex (Realtime Database)
+- **Auth**: Convex Auth (`@convex-dev/auth`) – Email/Passwort
+- **UI**: Shadcn/UI + Tailwind CSS 4
+- **Forms**: React Hook Form + Zod
 
-- **Frontend**: SvelteKit (TypeScript), TailwindCSS, Flowbite-Svelte
-- **Backend**: Java 21, Spring Boot, Spring Security, OAuth2 (Google)
-- **Datenbank**: PostgreSQL
-- **Infra**: Docker Compose
+## Setup
 
-## Schnellstart
-
-Mit dem Start-Skript kannst du das gesamte Projekt bequem starten:
-
-```bash
-# Alles starten (Datenbank + Backend + Frontend)
-./start.sh
-
-# Oder nur spezifische Services:
-./start.sh db        # Nur PostgreSQL-Datenbank
-./start.sh backend   # Nur Backend (inkl. Datenbank)
-./start.sh frontend  # Nur Frontend
-./start.sh docker    # Alles via Docker Compose
-./start.sh status    # Status anzeigen
-./start.sh stop      # Alles stoppen
-./start.sh help      # Hilfe anzeigen
-```
-
-## Manuelles Starten
-
-### 1. Datenbank starten
+### 1. Convex Projekt erstellen
 
 ```bash
-docker compose up -d postgres
+cd nextjs-app
+npx convex dev
 ```
 
-Die Datenbank läuft dann auf `localhost:5433` (Port 5433 auf dem Host, um Konflikte zu vermeiden).
+Beim ersten Mal: Neues Convex-Projekt erstellen oder bestehendes verknüpfen.
+Dadurch wird `convex/_generated/` mit generierten Typen erstellt.
 
-### 2. Backend starten
+### 2. Convex Auth Keys generieren
 
 ```bash
-cd java-backend
-mvn spring-boot:run
+npx @convex-dev/auth generate-key
 ```
 
-Das Backend läuft auf http://localhost:8080
+Secrets im Convex Dashboard setzen:
+- `JWT_PRIVATE_KEY`
+- `JWKS`
+- `SITE_URL` = `http://localhost:3000`
 
-### 3. Frontend starten
+### 3. Env-Datei anlegen
 
 ```bash
-cd svelte-frontend
-npm install   # Nur beim ersten Mal
-npm run dev
+cp .env.local.example .env.local
+# NEXT_PUBLIC_CONVEX_URL aus dem Convex Dashboard eintragen
 ```
 
-Das Frontend läuft auf http://localhost:5173
-
-## Ports
-
-| Service   | Port  | URL                     |
-|-----------|-------|-------------------------|
-| Frontend  | 5173  | http://localhost:5173   |
-| Backend   | 8080  | http://localhost:8080   |
-| Postgres  | 5433  | localhost:5433          |
-
-## Docker Compose (Production-like)
+### 4. Entwicklung starten
 
 ```bash
-# Alles starten
-docker compose --profile app up -d --build
+# Terminal 1: Convex
+npx convex dev
 
-# Nur Datenbank starten
-docker compose up -d postgres
-
-# Stoppen
-docker compose --profile app down
+# Terminal 2: Next.js
+pnpm dev
 ```
 
-## Umgebungsvariablen
-
-Die App benötigt folgende Umgebungsvariablen (in `.env` im Root-Verzeichnis):
-
-```env
-# Datenbank
-POSTGRES_DB=venera
-POSTGRES_USER=venera
-POSTGRES_PASSWORD=venera
-
-# OAuth2 (Google)
-GOOGLE_CLIENT_ID=deine-client-id
-GOOGLE_CLIENT_SECRET=dein-client-secret
-
-# Ports (optional)
-POSTGRES_HOST_PORT=5433
-BACKEND_HOST_PORT=8080
-FRONTEND_HOST_PORT=5173
-```
+Öffne http://localhost:3000
 
 ## Projektstruktur
 
 ```
-venera/
-├── java-backend/       # Spring Boot Backend (Onion-Architektur)
-│   ├── src/main/java/
-│   │   └── com/hardytec/venera/
-│   │       ├── domain/
-│   │       ├── application/
-│   │       ├── adapters/
-│   │       └── configuration/
-│   └── pom.xml
-├── svelte-frontend/    # SvelteKit Frontend
-│   ├── src/
-│   │   ├── lib/
-│   │   │   ├── api/    # API-Clients
-│   │   │   └── features/
-│   │   └── routes/
-│   └── package.json
-├── docker-compose.yml
-└── start.sh            # Start-Skript
+nextjs-app/
+├── app/
+│   ├── (auth)/           # Login, Register, Forgot Password
+│   ├── (protected)/      # Auth-geschützte Seiten
+│   │   ├── inbox/        # Aufgaben ohne Datum
+│   │   ├── calendar/     # Kalender-Ansicht (T04)
+│   │   ├── projects/     # Projekte (T05)
+│   │   └── code-diff/    # GitHub Code Review (T07)
+│   └── layout.tsx
+├── convex/
+│   ├── schema.ts         # Datenbankschema
+│   ├── auth.config.ts    # Convex Auth Konfiguration
+│   ├── lib/auth.ts       # Auth-Hilfsfunktionen
+│   └── tasks/            # Tasks Modul
+└── middleware.ts         # Auth-Middleware
 ```
-
-## Architektur
-
-Das Backend folgt der Onion-Architektur:
-- `domain`: Entitäten, Value Objects, Domain-Regeln
-- `application`: Use Cases, Commands/Queries
-- `adapters`: Web, Persistence, Security
-- `configuration`: Spring Wiring
-
-Das Frontend ist feature-basiert organisiert unter `src/lib/features/*`.
