@@ -152,14 +152,16 @@ GitHub-Repository-Review-Tracking:
 ---
 
 ### [maintenance] AUFG-009: AGENTS.md und CLAUDE.md aktualisieren
-**Status:** 🔄 Teilweise erledigt (Lauf #1)
-**Agent:** MAINTENANCE_AGENT
+**Status:** ✅ Erledigt (Lauf #11)
+**Agent:** FEATURE_AGENT / MAINTENANCE_AGENT
 
 - [x] Clerk-Referenzen durch Convex Auth ersetzen
 - [x] Tech Stack aktualisieren (@convex-dev/auth statt @clerk/nextjs)
 - [x] Projektname von "SentryCommand" auf "Venera" aktualisiert
-- [ ] Authentifizierungs-Pattern mit Convex Auth vollständig dokumentieren
-- [ ] Code-Beispiele in AGENTS.md auf requireAuth() aktualisieren (nicht requireOrgIdentity)
+- [x] Authentifizierungs-Pattern mit Convex Auth vollständig dokumentieren — Lauf #11
+- [x] Code-Beispiele in AGENTS.md auf requireAuth() aktualisieren (nicht requireOrgIdentity) — Lauf #11
+- [x] Common Issues: Clerk-Referenzen durch Convex Auth ersetzt — Lauf #11
+- [x] Neue Sektion 3a: Authentication Pattern hinzugefügt — Lauf #11
 
 ---
 

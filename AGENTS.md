@@ -102,57 +102,37 @@ export const defaultEntity: Partial<CreateEntity> = {
 ```typescript
 import { mutation } from "../../_generated/server";
 import { requireAuth } from "../../lib/auth";
-import { createEntitySchema } from "../_model/entity";
-import { zCustomMutation, zid } from "convex-helpers/server/zod4";
-import { NoOp } from "convex-helpers/server/customFunctions";
-import { z } from "zod";
-
-const zMutation = zCustomMutation(mutation, NoOp);
+import { v } from "convex/values";
 
 // CREATE
-export const create = zMutation({
-	args: createEntitySchema,
+export const create = mutation({
+	args: {
+		name: v.string(),
+		// ... weitere Felder
+	},
 	handler: async (ctx, args) => {
-		const { orgId } = await requireOrgIdentity(
-			await ctx.auth.getUserIdentity(),
-		);
-
-		// Validate relationships (if present)
-		if (args.parent_id) {
-			const parent = await ctx.db.get(args.parent_id);
-			if (!parent || parent.org_id !== orgId) {
-				throw new Error("Parent not found");
-			}
-		}
+		const { userId } = await requireAuth(ctx);
 
 		return ctx.db.insert("entities", {
 			...args,
-			org_id: orgId,
+			userId,
 		});
 	},
 });
 
 // UPDATE
-export const update = zMutation({
-	args: createEntitySchema.partial().extend({
-		id: zid("entities"),
-	}),
+export const update = mutation({
+	args: {
+		id: v.id("entities"),
+		name: v.optional(v.string()),
+		// ... weitere Felder
+	},
 	handler: async (ctx, { id, ...updates }) => {
-		const { orgId } = await requireOrgIdentity(
-			await ctx.auth.getUserIdentity(),
-		);
+		const { userId } = await requireAuth(ctx);
 
 		const entity = await ctx.db.get(id);
-		if (!entity || entity.org_id !== orgId) {
+		if (!entity || entity.userId !== userId) {
 			throw new Error("Entity not found");
-		}
-
-		// Validate relationships on updates
-		if (updates.parent_id) {
-			const parent = await ctx.db.get(updates.parent_id);
-			if (!parent || parent.org_id !== orgId) {
-				throw new Error("Parent not found");
-			}
 		}
 
 		await ctx.db.patch(id, updates);
@@ -161,15 +141,13 @@ export const update = zMutation({
 });
 
 // DELETE (with cascade for dependent resources)
-export const remove = zMutation({
-	args: z.object({ id: zid("entities") }),
+export const remove = mutation({
+	args: { id: v.id("entities") },
 	handler: async (ctx, { id }) => {
-		const { orgId } = await requireOrgIdentity(
-			await ctx.auth.getUserIdentity(),
-		);
+		const { userId } = await requireAuth(ctx);
 
 		const entity = await ctx.db.get(id);
-		if (!entity || entity.org_id !== orgId) {
+		if (!entity || entity.userId !== userId) {
 			throw new Error("Entity not found");
 		}
 
@@ -206,40 +184,16 @@ import { query } from "../../_generated/server";
 import { v } from "convex/values";
 import { requireAuth } from "../../lib/auth";
 
-// LIST - All entities of an organization
+// LIST - Alle Entities des eingeloggten Nutzers
 export const list = query({
 	handler: async (ctx) => {
-		const { orgId } = await requireOrgIdentity(
-			await ctx.auth.getUserIdentity(),
-		);
+		const { userId } = await requireAuth(ctx);
 
-		const entities = await ctx.db
+		return ctx.db
 			.query("entities")
-			.withIndex("by_org", (q) => q.eq("org_id", orgId))
+			.withIndex("by_user", (q) => q.eq("userId", userId))
+			.order("desc")
 			.collect();
-
-		// Load templates (if needed)
-		const templates = await ctx.db.query("templates").collect();
-
-		// Resolve storage URLs and assign templates
-		return Promise.all(
-			entities.map(async (entity) => {
-				const template = entity.template_id
-					? (templates.find((t) => t._id === entity.template_id) ??
-						null)
-					: null;
-
-				const imageUrl = entity.custom_image
-					? await ctx.storage.getUrl(entity.custom_image)
-					: null;
-
-				return {
-					...entity,
-					template,
-					imageUrl,
-				};
-			}),
-		);
 	},
 });
 
@@ -247,36 +201,14 @@ export const list = query({
 export const get = query({
 	args: { id: v.id("entities") },
 	handler: async (ctx, { id }) => {
-		const { orgId } = await requireOrgIdentity(
-			await ctx.auth.getUserIdentity(),
-		);
+		const { userId } = await requireAuth(ctx);
 
 		const entity = await ctx.db.get(id);
-		if (!entity || entity.org_id !== orgId) {
+		if (!entity || entity.userId !== userId) {
 			return null;
 		}
 
-		const template = entity.template_id
-			? await ctx.db.get(entity.template_id)
-			: null;
-
-		const imageUrl = entity.custom_image
-			? await ctx.storage.getUrl(entity.custom_image)
-			: null;
-
-		return {
-			...entity,
-			template,
-			imageUrl,
-		};
-	},
-});
-
-// LIST Templates (global, no org_id)
-export const listTemplates = query({
-	handler: async (ctx) => {
-		await requireOrgIdentity(await ctx.auth.getUserIdentity());
-		return ctx.db.query("templates").collect();
+		return entity;
 	},
 });
 ```
@@ -938,12 +870,14 @@ When a new data structure (e.g., "Mission") should be added to the project:
 
 #### Backend (Convex)
 
-- ✅ **Always** use `requireAuth()` in mutations/queries
-- ✅ **Always** check org_id on updates/deletes
+- ✅ **Always** use `requireAuth()` in mutations/queries — gibt `{ userId }` zurück
+- ✅ **Always** check `entity.userId !== userId` bei Updates/Deletes
+- ✅ **Org-Zugriff**: Mitgliedschaft via `orgMemberships`-Tabelle prüfen (nicht über auth)
 - ✅ **Cascade deletes** for dependent resources
 - ✅ **Storage cleanup** on deletes
-- ✅ **zCustomMutation** instead of plain `mutation()`
+- ✅ Standard `mutation()` / `query()` — kein `zCustomMutation` erforderlich
 - ❌ **No direct ctx.auth** usage without requireAuth
+- ❌ **No requireOrgIdentity** — existiert nicht in diesem Projekt
 
 #### Frontend (Next.js)
 
@@ -972,6 +906,51 @@ When a new data structure (e.g., "Mission") should be added to the project:
 - Enums: camelCase + Enum suffix (`statusEnum`)
 - Functions: camelCase (`createEntity`)
 - Constants: camelCase (`defaultEntity`)
+
+### 3a. Authentication Pattern (Convex Auth)
+
+Dieses Projekt verwendet `@convex-dev/auth` — kein Clerk, kein externer Auth-Service.
+
+#### requireAuth Helper (`convex/lib/auth.ts`)
+
+```typescript
+import { getAuthUserId } from "@convex-dev/auth/server";
+import type { QueryCtx, MutationCtx, ActionCtx } from "../_generated/server";
+
+export async function requireAuth(ctx: QueryCtx | MutationCtx | ActionCtx) {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) throw new Error("Nicht authentifiziert. Bitte einloggen.");
+  return { userId };
+}
+```
+
+#### Nutzung in Mutations und Queries
+
+```typescript
+// Persönliche Ressource (nur eigene Daten)
+const { userId } = await requireAuth(ctx);
+const entity = await ctx.db.get(id);
+if (!entity || entity.userId !== userId) throw new Error("Nicht gefunden.");
+
+// Org-Ressource (Mitgliedschaft prüfen)
+const { userId } = await requireAuth(ctx);
+const membership = await ctx.db
+  .query("orgMemberships")
+  .withIndex("by_org_user", (q) => q.eq("orgId", orgId).eq("userId", userId))
+  .first();
+if (!membership) throw new Error("Kein Zugriff.");
+```
+
+#### Frontend-Auth (Next.js)
+
+```typescript
+// Authentifizierungs-Status in Client Components
+import { useAuthActions } from "@convex-dev/auth/react";
+const { signIn, signOut } = useAuthActions();
+
+// Geschützte Routen via middleware.ts
+import { convexAuthNextjsMiddleware } from "@convex-dev/auth/nextjs/server";
+```
 
 ### 4. Git Workflow
 
@@ -1100,22 +1079,28 @@ pnpm dev
 
 ## Common Issues
 
-### "No active organization in session"
+### "Nicht authentifiziert. Bitte einloggen."
 
-- Make sure Clerk organization support is active
-- User must be assigned to an organization
-- Check Clerk JWT template for `org_id` claim
+- `requireAuth(ctx)` wirft diesen Fehler wenn kein User eingeloggt ist
+- Prüfe `middleware.ts` — geschützte Routen benötigen `convexAuthNextjsMiddleware`
+- Prüfe `CONVEX_SITE_URL` Env-Variable in `.env.local` (für HTTP-Router)
+- Prüfe `auth.addHttpRoutes(http)` in `convex/http.ts`
+
+### "Kein Zugriff auf Organisation"
+
+- Mitgliedschaft via `orgMemberships`-Tabelle prüfen: `by_org_user` Index
+- User muss Mitglied sein → Einladung über `/team/[orgId]`
 
 ### "Entity not found"
 
-- org_id doesn't match → Check requireOrgIdentity
+- `entity.userId !== userId` → User hat keinen Zugriff
 - ID is undefined → Check query "skip" logic
 - Entity was deleted → Handle null case
 
 ### Images not displaying
 
 - Storage URL expires → Always load fresh URLs via `ctx.storage.getUrl()`
-- org_id check missing → Check storage queries as well
+- userId check missing → Check storage queries as well
 - File not uploaded → Check upload response
 
 ### Form validation fails

@@ -70,6 +70,14 @@ Kompakte Erinnerung für zukünftige Läufe. Enthält wichtige Erkenntnisse, sen
 - `convex/_generated/` fehlt noch (wird durch `convex dev` erstellt) — Build nicht möglich ohne
 - Inbox Edit-Page nutzt React 19 `use(params)` für async params
 
+### Erkenntnisse aus Lauf #11 (2026-04-18)
+- AUFG-009 vollständig erledigt: AGENTS.md Authentication-Dokumentation vollständig korrigiert
+- Mutations/Queries-Beispiele zeigen jetzt `requireAuth(ctx)` → `{ userId }` (nicht `requireOrgIdentity`)
+- Autorisierung: `entity.userId !== userId` für persönliche Ressourcen; `orgMemberships`-Tabelle für Org-Ressourcen
+- Neue Sektion 3a in AGENTS.md: vollständiges Convex Auth Pattern dokumentiert
+- Common Issues: Clerk-Troubleshooting durch Convex Auth Troubleshooting ersetzt
+- Nächster Agent in Rotation: SECURITY_AGENT (alle FEATURE-Tasks abgeschlossen)
+
 ### Erkenntnisse aus Lauf #10 (2026-04-18)
 - AUFG-006 Cron-Scheduler vollständig implementiert
 - `convex/crons.ts` — Convex `cronJobs()` alle 15 Minuten → `runScheduledAgents`

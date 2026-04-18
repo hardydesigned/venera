@@ -545,3 +545,43 @@ AUFG-006: Zeitgesteuerte Agenten (Convex Scheduler / Cron)
 1. AUFG-009: Dokumentation (CLAUDE.md / AGENTS.md) aktualisieren → MAINTENANCE_AGENT
 2. SECURITY_AGENT: Security Review aller Endpoints
 3. TEST_AGENT: Tests für Cron-Scheduler + bestehende Features
+
+---
+
+## Run #11 — 2026-04-18
+
+**Branch:** `claude/auto-coder` ✅
+**Agent:** FEATURE_AGENT
+**Grund:** Offene Aufgaben vorhanden (AUFG-009 Dokumentation) → FEATURE_AGENT
+
+### Bearbeitete Hauptaufgabe
+AUFG-009: AGENTS.md Code-Beispiele und Authentication-Dokumentation aktualisieren
+
+### Kurzplan
+1. AGENTS.md Mutations-Beispiele: `requireOrgIdentity` + `orgId` → `requireAuth` + `userId`
+2. AGENTS.md Queries-Beispiele: gleiche Korrektur
+3. AGENTS.md: Neue Sektion "3a. Authentication Pattern" mit vollständigem Convex Auth Pattern
+4. AGENTS.md: Common Issues Clerk-Referenzen durch Convex Auth ersetzen
+5. AGENTS.md: Backend-Regeln präzisiert (requireOrgIdentity existiert nicht)
+6. Aufgabe.md, log.md, memory.md, state.json aktualisieren
+
+### Wichtigste Änderungen
+- **AGENTS.md** Mutations-Beispiel: `requireOrgIdentity(ctx.auth.getUserIdentity())` → `requireAuth(ctx)`, `orgId` → `userId`, Autorisierungsprüfung per `entity.userId !== userId`
+- **AGENTS.md** Queries-Beispiel: gleiche Korrektur + vereinfacht (kein Storage-URL-Pattern nötig im Template)
+- **AGENTS.md** Sektion 3a neu: vollständiges Authentication Pattern mit requireAuth, Frontend-Auth (useAuthActions), Middleware
+- **AGENTS.md** Backend-Regeln: `requireOrgIdentity` als ❌ markiert (existiert nicht), Org-Zugriff via orgMemberships dokumentiert
+- **AGENTS.md** Common Issues: Clerk-Abschnitt komplett ersetzt durch Convex Auth Troubleshooting
+
+### Verifikation
+- Dateipfad: ✅ AGENTS.md korrekt aktualisiert
+- Konsistenz: ✅ Neue Patterns stimmen mit tatsächlichem Code (tasks/mutations.ts, lib/auth.ts) überein
+- TypeScript Build: ⚠️ Nicht prüfbar (nur Dokumentationsdatei geändert)
+- Korrektheit: ✅ `requireAuth` gibt `{ userId }` zurück — verifiziert gegen `convex/lib/auth.ts` + `convex/tasks/tasks/mutations.ts`
+
+### Neu hinzugefügte Aufgaben
+- Keine neuen Aufgaben
+
+### Empfohlene nächste Schritte
+1. SECURITY_AGENT: Security Review aller Endpoints (nächster Agent in Rotation)
+2. TEST_AGENT: Tests für bestehende Features
+3. MAINTENANCE_AGENT: Code-Vereinfachungen
