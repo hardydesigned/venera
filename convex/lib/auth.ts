@@ -1,28 +1,17 @@
-import type { UserIdentity } from "convex/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
+import type { QueryCtx, MutationCtx, ActionCtx } from "../_generated/server";
 
-export interface AuthIdentity {
-  userId: string;
-  orgId?: string;
-}
-
+/**
+ * Gibt die authentifizierte User-ID zurück.
+ * Wirft einen Fehler, wenn der Nutzer nicht eingeloggt ist.
+ * Unterstützt Query-, Mutation- und Action-Kontexte.
+ */
 export async function requireAuth(
-  identity: UserIdentity | null,
-): Promise<AuthIdentity> {
-  if (!identity) {
-    throw new Error("Nicht authentifiziert");
+  ctx: QueryCtx | MutationCtx | ActionCtx,
+) {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) {
+    throw new Error("Nicht authentifiziert. Bitte einloggen.");
   }
-  return {
-    userId: identity.subject,
-  };
-}
-
-export async function requireOrgIdentity(
-  identity: UserIdentity | null,
-): Promise<Required<AuthIdentity>> {
-  const auth = await requireAuth(identity);
-  const orgId = (identity as UserIdentity & { orgId?: string }).orgId;
-  if (!orgId) {
-    throw new Error("Keine aktive Organisation");
-  }
-  return { userId: auth.userId, orgId };
+  return { userId };
 }

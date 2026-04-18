@@ -1,0 +1,15 @@
+{
+	"/(protected)": [],
+	"/": [
+		"src/routes/+page.server.ts"
+	],
+	"/auth/callback": [],
+	"/(protected)/calendar": [],
+	"/(protected)/calendar/woche": [],
+	"/forgot-password": [],
+	"/(protected)/inbox": [],
+	"/login": [],
+	"/(protected)/projects": [],
+	"/register": [],
+	"/reset-password": []
+}

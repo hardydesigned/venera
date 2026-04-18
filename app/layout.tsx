@@ -1,33 +1,32 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import "./globals.css";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
-import { ConvexClientProvider } from "./ConvexClientProvider";
-import { Toaster } from "@/components/ui/sonner";
+import { ConvexClientProvider } from "@/components/ConvexClientProvider";
+import { Toaster } from "sonner";
+import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const geist = Geist({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Venera",
-  description: "Persönliche Produktivitäts-Plattform",
+  description: "Persönliche Produktivitäts- und Projektmanagement-App",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <ConvexAuthNextjsServerProvider>
-      <html lang="de" className={`${geistSans.variable} h-full antialiased`}>
-        <body className="min-h-full flex flex-col">
-          <ConvexClientProvider>{children}</ConvexClientProvider>
-          <Toaster />
-        </body>
-      </html>
-    </ConvexAuthNextjsServerProvider>
+    <html lang="de" suppressHydrationWarning>
+      <body className={geist.className}>
+        <ConvexAuthNextjsServerProvider>
+          <ConvexClientProvider>
+            {children}
+            <Toaster richColors position="top-right" />
+          </ConvexClientProvider>
+        </ConvexAuthNextjsServerProvider>
+      </body>
+    </html>
   );
 }

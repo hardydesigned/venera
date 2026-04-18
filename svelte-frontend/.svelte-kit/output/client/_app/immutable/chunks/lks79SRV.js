@@ -1,0 +1,1 @@
+import{a as r}from"./DEY2OtiX.js";async function a(){const t=await r("/auth/me");if(t.status===401)return null;if(!t.ok)throw new Error(`Current user fetch failed: ${t.status}`);return await t.json()}async function e(){const t=await r("/auth/logout",{method:"POST"});if(!t.ok)throw new Error(`Logout failed: ${t.status}`)}export{a as f,e as l};

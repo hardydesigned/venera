@@ -1,70 +1,192 @@
 import { defineSchema, defineTable } from "convex/server";
+import { authTables } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 
 export default defineSchema({
-  authAccounts: defineTable({
-    provider: v.string(),
-    providerAccountId: v.string(),
-    secret: v.optional(v.string()),
+  ...authTables,
+
+  // Nutzer-Profile (ergänzt das authTables users)
+  userProfiles: defineTable({
     userId: v.id("users"),
-    emailVerified: v.optional(v.number()),
-  })
-    .index("by_providerAndAccountId", ["provider", "providerAccountId"])
-    .index("by_userId", ["userId"]),
+    displayName: v.optional(v.string()),
+    avatarUrl: v.optional(v.string()),
+    personalOrgId: v.optional(v.string()),
+  }).index("by_user", ["userId"]),
 
-  authSessions: defineTable({
-    userId: v.id("users"),
-    expirationTime: v.number(),
-  }).index("by_userId", ["userId"]),
-
-  authVerificationCodes: defineTable({
-    accountId: v.id("authAccounts"),
-    code: v.string(),
-    expirationTime: v.number(),
-    provider: v.optional(v.string()),
-    verifier: v.optional(v.string()),
-    emailVerified: v.optional(v.number()),
-    phone: v.optional(v.string()),
-  }).index("by_accountId", ["accountId"]),
-
-  authVerifiers: defineTable({
-    sessionId: v.optional(v.id("authSessions")),
-    signature: v.string(),
-  }).index("by_signature", ["signature"]),
-
-  authRateLimits: defineTable({
-    identifier: v.string(),
-    lastAttemptTime: v.number(),
-    attemptsCount: v.number(),
-  }).index("by_identifier", ["identifier"]),
-
-  users: defineTable({
-    name: v.optional(v.string()),
-    email: v.optional(v.string()),
-    emailVerificationTime: v.optional(v.number()),
-    image: v.optional(v.string()),
-    isAnonymous: v.optional(v.boolean()),
-  })
-    .index("by_email", ["email"]),
-
+  // Aufgaben (persönlich + Team)
   tasks: defineTable({
-    userId: v.string(),
-    orgId: v.optional(v.string()),
+    userId: v.id("users"),
+    orgId: v.optional(v.id("organizations")),
     title: v.string(),
-    description: v.string(),
-    startDate: v.union(v.string(), v.null()),
-    dueDate: v.union(v.string(), v.null()),
-    category: v.union(v.literal("A"), v.literal("B"), v.literal("C")),
+    description: v.optional(v.string()),
     status: v.union(
-      v.literal("OPEN"),
-      v.literal("IN_PROGRESS"),
-      v.literal("DONE"),
-      v.literal("CANCELLED"),
+      v.literal("open"),
+      v.literal("in_progress"),
+      v.literal("done"),
+      v.literal("cancelled"),
     ),
-    estimatedDurationMinutes: v.union(v.number(), v.null()),
-    actualDurationMinutes: v.union(v.number(), v.null()),
+    priority: v.union(v.literal("A"), v.literal("B"), v.literal("C")),
+    dueDate: v.optional(v.number()),
+    startDate: v.optional(v.number()),
+    projectId: v.optional(v.id("projects")),
+    assigneeId: v.optional(v.id("users")),
   })
     .index("by_user", ["userId"])
     .index("by_org", ["orgId"])
-    .index("by_user_status", ["userId", "status"]),
+    .index("by_project", ["projectId"]),
+
+  // Projekte
+  projects: defineTable({
+    userId: v.id("users"),
+    orgId: v.optional(v.string()),
+    title: v.string(),
+    description: v.optional(v.string()),
+    goal: v.optional(v.string()),
+    color: v.optional(v.string()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_org", ["orgId"]),
+
+  // Kalender-Ereignisse
+  calendarEvents: defineTable({
+    userId: v.id("users"),
+    orgId: v.optional(v.string()),
+    title: v.string(),
+    startAt: v.number(),
+    endAt: v.number(),
+    color: v.optional(v.string()),
+    projectId: v.optional(v.id("projects")),
+    taskId: v.optional(v.id("tasks")),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_time", ["userId", "startAt"]),
+
+  // Code Diff: GitHub Repository Review-Tracking
+  codeDiffRepos: defineTable({
+    userId: v.id("users"),
+    orgId: v.optional(v.string()),
+    owner: v.string(),
+    name: v.string(),
+    token: v.optional(v.string()),
+    description: v.optional(v.string()),
+    defaultBranch: v.string(),
+    lastSyncAt: v.optional(v.number()),
+  }).index("by_user", ["userId"]),
+
+  codeDiffFiles: defineTable({
+    repoId: v.id("codeDiffRepos"),
+    path: v.string(),
+    status: v.union(
+      v.literal("needs_review"),
+      v.literal("reviewed"),
+      v.literal("todo"),
+      v.literal("always_green"),
+    ),
+    blobSha: v.optional(v.string()),
+  })
+    .index("by_repo", ["repoId"])
+    .index("by_repo_path", ["repoId", "path"]),
+
+  // Organisationen (Team-Accounts)
+  organizations: defineTable({
+    name: v.string(),
+    slug: v.string(),
+    ownerId: v.id("users"),
+  })
+    .index("by_owner", ["ownerId"])
+    .index("by_slug", ["slug"]),
+
+  // Org-Mitgliedschaften
+  orgMemberships: defineTable({
+    orgId: v.id("organizations"),
+    userId: v.id("users"),
+    role: v.union(v.literal("owner"), v.literal("member")),
+    invitedBy: v.optional(v.id("users")),
+  })
+    .index("by_org", ["orgId"])
+    .index("by_user", ["userId"])
+    .index("by_org_user", ["orgId", "userId"]),
+
+  // Data Lake: Storage-Verbindungen (Nextcloud, OneDrive, etc.)
+  dataLakeConnections: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    provider: v.union(
+      v.literal("nextcloud"),
+      v.literal("onedrive"),
+      v.literal("googledrive"),
+    ),
+    webdavUrl: v.optional(v.string()),
+    username: v.optional(v.string()),
+    password: v.optional(v.string()),
+    lastSyncAt: v.optional(v.number()),
+  }).index("by_user", ["userId"]),
+
+  // Data Lake: Gecachte Datei/Ordner-Einträge
+  dataLakeItems: defineTable({
+    connectionId: v.id("dataLakeConnections"),
+    path: v.string(),
+    name: v.string(),
+    type: v.union(v.literal("file"), v.literal("folder")),
+    size: v.optional(v.number()),
+    lastModified: v.optional(v.number()),
+    contentType: v.optional(v.string()),
+    etag: v.optional(v.string()),
+  })
+    .index("by_connection", ["connectionId"])
+    .index("by_connection_path", ["connectionId", "path"]),
+
+  // Nutzer-Feedback (Feature-Wünsche + Problemmeldungen)
+  userFeedback: defineTable({
+    userId: v.id("users"),
+    type: v.union(v.literal("feature"), v.literal("bug"), v.literal("other")),
+    title: v.string(),
+    description: v.string(),
+    status: v.union(
+      v.literal("new"),
+      v.literal("in_review"),
+      v.literal("done"),
+    ),
+  })
+    .index("by_user", ["userId"])
+    .index("by_status", ["status"]),
+
+  // KI-Agenten
+  aiAgents: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    description: v.optional(v.string()),
+    prompt: v.string(),
+    schedule: v.optional(v.string()), // cron expression, z.B. "0 9 * * 1"
+    connections: v.array(v.string()), // IDs von dataLakeConnections oder "github:<repoId>"
+    isActive: v.boolean(),
+    lastRunAt: v.optional(v.number()),
+    nextRunAt: v.optional(v.number()), // Nächster geplanter Lauf (Timestamp)
+  }).index("by_user", ["userId"])
+    .index("by_next_run", ["nextRunAt"]),
+
+  // KI-Agenten Logs
+  agentLogs: defineTable({
+    agentId: v.id("aiAgents"),
+    startedAt: v.number(),
+    finishedAt: v.optional(v.number()),
+    status: v.union(
+      v.literal("running"),
+      v.literal("success"),
+      v.literal("error"),
+    ),
+    summary: v.optional(v.string()),
+    errorMessage: v.optional(v.string()),
+  }).index("by_agent", ["agentId"]),
+
+  // Telegram Bot Einstellungen
+  telegramSettings: defineTable({
+    userId: v.id("users"),
+    botToken: v.string(),
+    authorizedChatId: v.string(),
+    webhookRegistered: v.boolean(),
+    lastMessageAt: v.optional(v.number()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_chat", ["authorizedChatId"]),
 });

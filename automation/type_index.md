@@ -1,33 +1,103 @@
-# Type Index – Venera Projekt
+# Type Index
 
-## Svelte Frontend Types (werden nach Convex migriert)
+Kompakte Auflistung aller relevanten TypeScript-Typen im Projekt.
+Bevor ein neuer Typ erstellt wird, bitte hier nachschauen!
 
-### Tasks (`svelte-frontend/src/lib/features/tasks/types.ts`)
-- `TaskStatus`: `'OPEN' | 'IN_PROGRESS' | 'DONE' | 'CANCELLED'`
-- `TaskPriorityCategory`: `'A' | 'B' | 'C'`
-- `Task`: `{ id, title, description, startDate, dueDate, category, status, estimatedDurationMinutes, actualDurationMinutes }`
-- `CreateTaskInput`: (ohne id)
-- `UpdateTaskInput`: (ohne id)
+## Convex / Auth
 
-### Teams (`svelte-frontend/src/lib/features/teams/types.ts`)
-- `TeamRole`: `'OWNER' | 'MEMBER'`
-- `TeamInvitationStatus`: `'PENDING' | 'ACCEPTED' | 'DECLINED'`
-- `Team`: `{ id, name, description, role, memberCount }`
-- `TeamInvitation`: `{ id, teamId, teamName, email, status, invitedByUserId, createdAt, respondedAt }`
-- `CreateTeamInput`: `{ name, description? }`
-- `InviteMemberInput`: `{ teamId, email }`
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `Id<"users">` | convex/_generated/dataModel | Convex User ID |
+| `Doc<"users">` | convex/_generated/dataModel | Convex User Dokument |
 
----
+## Tasks
 
-## Next.js / Convex Types (`nextjs-app/`)
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `Task` | convex/tasks/_model/task.ts | `Doc<"tasks">` — Convex Task Dokument |
+| `TaskStatus` | convex/tasks/_model/task.ts | `"open" \| "in_progress" \| "done" \| "cancelled"` |
+| `TaskPriority` | convex/tasks/_model/task.ts | `"A" \| "B" \| "C"` |
+| `CreateTask` | convex/tasks/_model/task.ts | Input-Schema für create/update Mutations |
+| `TaskFormData` | convex/tasks/_model/task.ts | Formular-Schema (partial für react-hook-form) |
 
-### Tasks (`convex/tasks/_model/task.ts`)
-- `TaskStatus`: `z.enum(["OPEN", "IN_PROGRESS", "DONE", "CANCELLED"])`
-- `TaskCategory`: `z.enum(["A", "B", "C"])`
-- `Task`: `Doc<"tasks">` – mit allen task-Feldern (userId, title, description, startDate, dueDate, category, status, etc.)
-- `CreateTask`: `z.infer<typeof createTaskSchema>` – ohne _id, _creationTime
-- `TaskFormData`: Partielle Form-Version von CreateTask
-- `defaultTask`: Partial<CreateTask> – Default-Werte für Formulare
+## Projekte
 
-### Auth (`convex/lib/auth.ts`)
-- `AuthIdentity`: `{ userId: string; orgId?: string }` – Rückgabe von requireAuth()
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `Project` | convex/projects/_model/project.ts | `Doc<"projects">` — Convex Projekt Dokument |
+| `ProjectColor` | convex/projects/_model/project.ts | `"gray" \| "red" \| "orange" \| ...` |
+| `CreateProject` | convex/projects/_model/project.ts | Input-Schema für create/update Mutations |
+| `ProjectFormData` | convex/projects/_model/project.ts | Formular-Schema (partial für react-hook-form) |
+
+## Kalender
+
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `CalendarEvent` | convex/calendar/_model/calendarEvent.ts | `Doc<"calendarEvents">` — Convex Kalender-Ereignis |
+| `CreateCalendarEvent` | convex/calendar/_model/calendarEvent.ts | Input-Schema für create/update Mutations |
+| `CalendarEventFormData` | convex/calendar/_model/calendarEvent.ts | Formular-Schema (partial für react-hook-form) |
+
+## Code Diff
+
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `CodeDiffRepo` | convex/codediff/_model/repo.ts | `Doc<"codeDiffRepos">` — GitHub Repository |
+| `CreateCodeDiffRepo` | convex/codediff/_model/repo.ts | Input-Schema für create Mutation |
+| `RepoFormData` | convex/codediff/_model/repo.ts | Formular-Schema |
+| `CodeDiffFile` | convex/codediff/_model/file.ts | `Doc<"codeDiffFiles">` — Datei mit Status |
+| `FileStatus` | convex/codediff/_model/file.ts | `"needs_review" \| "reviewed" \| "todo" \| "always_green"` |
+
+## Organisationen / Team
+
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `Organization` | convex/organizations/_model/organization.ts | `Doc<"organizations">` — Convex Org Dokument |
+| `OrgMembership` | convex/organizations/_model/organization.ts | `Doc<"orgMemberships">` — Mitgliedschaft |
+| `OrgRole` | convex/organizations/_model/organization.ts | `"owner" \| "member"` |
+| `CreateOrg` | convex/organizations/_model/organization.ts | Input-Schema für create Mutation |
+| `OrgFormData` | convex/organizations/_model/organization.ts | Formular-Schema |
+| `OrgMemberWithUser` | convex/organizations/_model/organization.ts | Mitglied + User-Details für UI |
+
+## Data Lake
+
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `DataLakeConnection` | convex/datalake/_model/connection.ts | `Doc<"dataLakeConnections">` — Storage-Verbindung |
+| `Provider` | convex/datalake/_model/connection.ts | `"nextcloud" \| "onedrive" \| "googledrive"` |
+| `CreateConnection` | convex/datalake/_model/connection.ts | Input-Schema für create Mutation |
+| `ConnectionFormData` | convex/datalake/_model/connection.ts | Formular-Schema |
+| `PROVIDER_LABELS` | convex/datalake/_model/connection.ts | Record<Provider, string> — Anzeigenamen |
+| `DataLakeItem` | convex/datalake/_model/item.ts | `Doc<"dataLakeItems">` — gecachtes Datei/Ordner-Item |
+| `ItemType` | convex/datalake/_model/item.ts | `"file" \| "folder"` |
+| `SyncItem` | convex/datalake/_model/item.ts | Interface für WebDAV-geparste Einträge |
+
+## KI-Agenten
+
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `AIAgent` | convex/agents/_model/agent.ts | `Doc<"aiAgents">` — KI-Agent Dokument |
+| `AgentLog` | convex/agents/_model/agent.ts | `Doc<"agentLogs">` — Ausführungs-Log |
+| `AgentConnectionType` | convex/agents/_model/agent.ts | `"datalake" \| "github"` |
+| `CreateAgent` | convex/agents/_model/agent.ts | Input-Schema für create/update Mutations |
+| `SCHEDULE_OPTIONS` | convex/agents/_model/agent.ts | Array mit Cron-Zeitplan-Optionen |
+
+## Telegram Bot
+
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `TelegramSettings` | convex/telegram/_model/telegram.ts | `Doc<"telegramSettings">` — Bot-Einstellungen |
+| `TelegramSettingsData` | convex/telegram/_model/telegram.ts | Formular-Schema für Bot-Konfiguration |
+
+## Feedback
+
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `UserFeedback` | convex/feedback/_model/feedback.ts | `Doc<"userFeedback">` — Nutzer-Feedback Dokument |
+
+## UI
+
+| Typ | Datei | Beschreibung |
+|-----|-------|-------------|
+| `BadgeProps` | components/ui/badge.tsx | Badge-Komponenten-Props |
+| `ButtonProps` | components/ui/button.tsx | Button-Komponenten-Props |
+| `DeleteConfirmDialogProps` | components/DeleteConfirmDialog.tsx | Lösch-Dialog Props |

@@ -1,7 +1,7 @@
 "use client";
 
-import { useAuthActions } from "@convex-dev/auth/react";
 import { useState } from "react";
+import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -22,96 +22,107 @@ export default function RegisterPage() {
   const { signIn } = useAuthActions();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
 
+    const formData = new FormData(e.currentTarget);
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (password !== confirmPassword) {
+      toast.error("Passwörter stimmen nicht überein.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      await signIn("password", { email, password, name, flow: "signUp" });
-      router.push("/inbox");
+      await signIn("password", {
+        email: formData.get("email") as string,
+        password,
+        flow: "signUp",
+        name: formData.get("name") as string,
+      });
+      router.push("/");
     } catch {
-      toast.error("Registrierung fehlgeschlagen. Bitte prüfe deine Angaben.");
+      toast.error("Registrierung fehlgeschlagen. Bitte erneut versuchen.");
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-2xl">Konto erstellen</CardTitle>
-        <CardDescription>
-          Erstelle ein neues Konto um Venera zu nutzen
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="Max Mustermann"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              data-testid="register-name"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">E-Mail</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="name@beispiel.de"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              data-testid="register-email"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Passwort</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Mindestens 8 Zeichen"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-              data-testid="register-password"
-            />
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-4">
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isLoading}
-            data-testid="register-submit"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Registrieren...
-              </>
-            ) : (
-              "Konto erstellen"
-            )}
-          </Button>
-          <p className="text-sm text-muted-foreground text-center">
-            Bereits ein Konto?{" "}
-            <Link href="/login" className="text-primary hover:underline">
-              Anmelden
-            </Link>
-          </p>
-        </CardFooter>
-      </form>
-    </Card>
+    <div className="flex min-h-screen items-center justify-center p-4">
+      <Card className="w-full max-w-sm">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold">Registrieren</CardTitle>
+          <CardDescription>Erstelle dein kostenloses Konto</CardDescription>
+        </CardHeader>
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="Max Mustermann"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">E-Mail</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="name@beispiel.de"
+                required
+                autoComplete="email"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Passwort</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                required
+                autoComplete="new-password"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Passwort bestätigen</Label>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required
+                autoComplete="new-password"
+              />
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-3">
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Wird registriert...
+                </>
+              ) : (
+                "Konto erstellen"
+              )}
+            </Button>
+            <p className="text-center text-sm text-muted-foreground">
+              Bereits registriert?{" "}
+              <Link href="/login" className="underline underline-offset-4">
+                Anmelden
+              </Link>
+            </p>
+          </CardFooter>
+        </form>
+      </Card>
+    </div>
   );
 }

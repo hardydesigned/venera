@@ -3,10 +3,10 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
@@ -23,11 +23,11 @@ export function DeleteConfirmDialog({
   onOpenChange,
   onConfirm,
   title = "Löschen bestätigen",
-  description = "Sind Sie sicher? Diese Aktion kann nicht rückgängig gemacht werden.",
+  description = "Diese Aktion kann nicht rückgängig gemacht werden.",
 }: DeleteConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent data-testid="delete-confirm-dialog">
+      <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
@@ -42,7 +42,6 @@ export function DeleteConfirmDialog({
               onConfirm();
               onOpenChange(false);
             }}
-            data-testid="delete-confirm-btn"
           >
             Löschen
           </Button>

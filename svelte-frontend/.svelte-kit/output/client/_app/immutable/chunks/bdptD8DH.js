@@ -1,0 +1,1 @@
+import{ab as t,d as c,b as o,ac as l,e as a}from"./jdfk-ZMK.js";function u(n){o===null&&t(),l&&o.l!==null?s(o).m.push(n):c(()=>{const e=a(n);if(typeof e=="function")return e})}function i(n){o===null&&t(),u(()=>()=>a(n))}function s(n){var e=n.l;return e.u??={a:[],b:[],m:[]}}export{i as a,u as o};

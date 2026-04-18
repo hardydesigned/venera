@@ -1,7 +1,7 @@
 "use client";
 
-import { useAuthActions } from "@convex-dev/auth/react";
 import { useState } from "react";
+import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -22,89 +22,79 @@ export default function LoginPage() {
   const { signIn } = useAuthActions();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
 
+    const formData = new FormData(e.currentTarget);
     try {
-      await signIn("password", { email, password, flow: "signIn" });
-      router.push("/inbox");
+      await signIn("password", {
+        email: formData.get("email") as string,
+        password: formData.get("password") as string,
+        flow: "signIn",
+      });
+      router.push("/");
     } catch {
-      toast.error("Ungültige E-Mail oder falsches Passwort");
+      toast.error("Anmeldung fehlgeschlagen. Bitte E-Mail und Passwort prüfen.");
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-2xl">Anmelden</CardTitle>
-        <CardDescription>
-          Melde dich mit deiner E-Mail und deinem Passwort an
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">E-Mail</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="name@beispiel.de"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              data-testid="login-email"
-            />
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Passwort</Label>
-              <Link
-                href="/forgot-password"
-                className="text-sm text-muted-foreground hover:underline"
-              >
-                Passwort vergessen?
-              </Link>
+    <div className="flex min-h-screen items-center justify-center p-4">
+      <Card className="w-full max-w-sm">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold">Anmelden</CardTitle>
+          <CardDescription>
+            Melde dich mit deiner E-Mail und deinem Passwort an
+          </CardDescription>
+        </CardHeader>
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">E-Mail</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="name@beispiel.de"
+                required
+                autoComplete="email"
+              />
             </div>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              data-testid="login-password"
-            />
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-4">
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isLoading}
-            data-testid="login-submit"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Anmelden...
-              </>
-            ) : (
-              "Anmelden"
-            )}
-          </Button>
-          <p className="text-sm text-muted-foreground text-center">
-            Noch kein Konto?{" "}
-            <Link href="/register" className="text-primary hover:underline">
-              Registrieren
-            </Link>
-          </p>
-        </CardFooter>
-      </form>
-    </Card>
+            <div className="space-y-2">
+              <Label htmlFor="password">Passwort</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                required
+                autoComplete="current-password"
+              />
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-3">
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Wird angemeldet...
+                </>
+              ) : (
+                "Anmelden"
+              )}
+            </Button>
+            <p className="text-center text-sm text-muted-foreground">
+              Noch kein Konto?{" "}
+              <Link href="/register" className="underline underline-offset-4">
+                Registrieren
+              </Link>
+            </p>
+          </CardFooter>
+        </form>
+      </Card>
+    </div>
   );
 }

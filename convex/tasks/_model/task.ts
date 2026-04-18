@@ -2,48 +2,40 @@ import { z } from "zod";
 import type { Doc } from "../../_generated/dataModel";
 
 export const taskStatusEnum = z.enum([
-  "OPEN",
-  "IN_PROGRESS",
-  "DONE",
-  "CANCELLED",
+  "open",
+  "in_progress",
+  "done",
+  "cancelled",
 ]);
 export type TaskStatus = z.infer<typeof taskStatusEnum>;
 
-export const taskCategoryEnum = z.enum(["A", "B", "C"]);
-export type TaskCategory = z.infer<typeof taskCategoryEnum>;
+export const taskPriorityEnum = z.enum(["A", "B", "C"]);
+export type TaskPriority = z.infer<typeof taskPriorityEnum>;
 
 export type Task = Doc<"tasks">;
 
 export const createTaskSchema = z.object({
-  userId: z.string().optional(),
-  orgId: z.string().optional(),
   title: z.string().min(1, "Titel ist erforderlich"),
-  description: z.string().default(""),
-  startDate: z.string().nullable().default(null),
-  dueDate: z.string().nullable().default(null),
-  category: taskCategoryEnum.default("B"),
-  status: taskStatusEnum.default("OPEN"),
-  estimatedDurationMinutes: z.number().nullable().default(null),
-  actualDurationMinutes: z.number().nullable().default(null),
+  description: z.string().optional(),
+  status: taskStatusEnum.default("open"),
+  priority: taskPriorityEnum.default("C"),
+  dueDate: z.number().optional(),
+  startDate: z.number().optional(),
+  projectId: z.string().optional(),
+  assigneeId: z.string().optional(),
+  orgId: z.string().optional(), // als String für Formulare, wird als Id genutzt
 });
 
 export type CreateTask = z.infer<typeof createTaskSchema>;
 
 export const taskFormSchema = createTaskSchema.partial().extend({
   title: z.string().min(1, "Titel ist erforderlich"),
-  category: taskCategoryEnum,
-  status: taskStatusEnum,
 });
 
 export type TaskFormData = z.infer<typeof taskFormSchema>;
 
 export const defaultTask: Partial<CreateTask> = {
   title: "",
-  description: "",
-  startDate: null,
-  dueDate: null,
-  category: "B",
-  status: "OPEN",
-  estimatedDurationMinutes: null,
-  actualDurationMinutes: null,
+  status: "open",
+  priority: "C",
 };

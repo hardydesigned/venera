@@ -5,19 +5,30 @@ import { usePathname } from "next/navigation";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { FeedbackDialog } from "@/components/FeedbackDialog";
 import {
-  Inbox,
-  Calendar,
+  LayoutDashboard,
+  CheckSquare,
   FolderKanban,
+  CalendarDays,
+  GitDiff,
+  Users,
+  Database,
+  Bot,
+  Send,
   LogOut,
-  GitCompare,
 } from "lucide-react";
 
 const navItems = [
-  { href: "/inbox", label: "Inbox", icon: Inbox },
-  { href: "/calendar", label: "Kalender", icon: Calendar },
-  { href: "/projects", label: "Projekte", icon: FolderKanban },
-  { href: "/code-diff", label: "Code Diff", icon: GitCompare },
+  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/inbox", label: "Inbox", icon: CheckSquare },
+  { href: "/projekte", label: "Projekte", icon: FolderKanban },
+  { href: "/kalender", label: "Kalender", icon: CalendarDays },
+  { href: "/code-diff", label: "Code Diff", icon: GitDiff },
+  { href: "/datalake", label: "Data Lake", icon: Database },
+  { href: "/agenten", label: "KI-Agenten", icon: Bot },
+  { href: "/agenten/telegram", label: "Telegram Bot", icon: Send },
+  { href: "/team", label: "Team", icon: Users },
 ];
 
 export function Sidebar() {
@@ -25,37 +36,42 @@ export function Sidebar() {
   const { signOut } = useAuthActions();
 
   return (
-    <aside className="flex h-full w-56 flex-col border-r bg-background px-3 py-4">
-      <div className="mb-6 px-2">
-        <h1 className="text-xl font-bold tracking-tight">Venera</h1>
+    <aside className="flex h-full w-64 flex-col border-r bg-card">
+      <div className="flex h-16 items-center border-b px-6">
+        <span className="text-xl font-bold tracking-tight">Venera</span>
       </div>
 
-      <nav className="flex flex-1 flex-col gap-1">
+      <nav className="flex-1 space-y-1 p-4">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
-            pathname === item.href || pathname.startsWith(item.href + "/");
-
+            item.href === "/"
+              ? pathname === "/"
+              : pathname === item.href ||
+                pathname.startsWith(`${item.href}/`);
           return (
-            <Link key={item.href} href={item.href}>
-              <Button
-                variant={isActive ? "secondary" : "ghost"}
-                className={cn("w-full justify-start gap-2", {
-                  "font-medium": isActive,
-                })}
-              >
-                <Icon className="h-4 w-4" />
-                {item.label}
-              </Button>
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                isActive
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+              )}
+            >
+              <Icon className="h-4 w-4" />
+              {item.label}
             </Link>
           );
         })}
       </nav>
 
-      <div className="mt-auto">
+      <div className="border-t p-4 space-y-1">
+        <FeedbackDialog />
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 text-muted-foreground"
+          className="w-full justify-start gap-3 text-muted-foreground"
           onClick={() => void signOut()}
         >
           <LogOut className="h-4 w-4" />
