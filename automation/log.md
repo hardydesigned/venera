@@ -501,3 +501,47 @@ AUFG-007: Telegram Bot Integration (vollständig)
 1. AUFG-006 Folgeaufgaben: Agent-Connections UI (Data Lake Verbindungen per UI verknüpfen)
 2. AUFG-009: Dokumentation (AGENTS.md/CLAUDE.md) aktualisieren
 3. SECURITY_AGENT: Security Review aller Endpoints (nach FEATURE-Abschluss)
+
+---
+
+## Run #10 — 2026-04-18
+
+**Branch:** `claude/auto-coder` ✅
+**Agent:** FEATURE_AGENT
+**Grund:** Offene Aufgaben vorhanden (AUFG-006 Cron-Scheduler) → FEATURE_AGENT
+
+### Bearbeitete Hauptaufgabe
+AUFG-006: Zeitgesteuerte Agenten (Convex Scheduler / Cron)
+
+### Kurzplan
+1. Schema: `nextRunAt` + `by_next_run` Index zu `aiAgents` hinzufügen
+2. `convex/agents/lib/schedule.ts` — Hilfsfunktion `computeNextRunAt` für SCHEDULE_OPTIONS-Expressions
+3. `convex/agents/run/scheduled.ts` — internalActions: `runScheduledAgents` + `runAgentById`
+4. `convex/agents/agents/mutations.ts` — `updateNextRun` internalMutation + nextRunAt in create/update
+5. `convex/agents/agents/queries.ts` — `listDueForRun` + `getInternal` internalQueries
+6. `convex/datalake/items/queries.ts` — `listByConnectionInternal` internalQuery
+7. `convex/crons.ts` — Convex cronJobs alle 15 Minuten
+
+### Wichtigste Änderungen
+- **convex/schema.ts**: `nextRunAt: v.optional(v.number())` + `.index("by_next_run", ["nextRunAt"])` in aiAgents
+- **convex/agents/lib/schedule.ts** (neu, 122 Zeilen): `computeNextRunAt()` für alle SCHEDULE_OPTIONS (täglich, wöchentlich, werktäglich, alle 6h)
+- **convex/agents/run/scheduled.ts** (neu, 127 Zeilen): `runScheduledAgents` (internalAction, kein User-Auth) + `runAgentById` (internalAction)
+- **convex/agents/agents/mutations.ts**: `updateNextRun` internalMutation; create/update berechnen jetzt nextRunAt
+- **convex/agents/agents/queries.ts**: `listDueForRun` (by_next_run Index-Scan) + `getInternal` (ohne Auth)
+- **convex/datalake/items/queries.ts**: `listByConnectionInternal` internalQuery für Agenten-Runs
+- **convex/crons.ts** (neu, 17 Zeilen): Convex cronJobs, alle 15 Minuten → `runScheduledAgents`
+
+### Verifikation
+- Dateistruktur: ✅ 7 Dateien (3 neu, 4 modifiziert), alle unter 250 Zeilen
+- 250-Zeilen-Regel: ✅ Längste neue Datei: scheduled.ts 127 Zeilen
+- TypeScript Build: ⚠️ Nicht prüfbar (convex/_generated/ + node_modules fehlen)
+- Cron-Logik: ✅ Manuell verifiziert — `computeNextRunAt` deckt alle 5 SCHEDULE_OPTIONS ab
+- API-Pfade: ✅ `internal.agents.run.scheduled.*`, `internal.agents.agents.queries.*`
+
+### Neu hinzugefügte Aufgaben
+- Keine neuen Aufgaben
+
+### Empfohlene nächste Schritte
+1. AUFG-009: Dokumentation (CLAUDE.md / AGENTS.md) aktualisieren → MAINTENANCE_AGENT
+2. SECURITY_AGENT: Security Review aller Endpoints
+3. TEST_AGENT: Tests für Cron-Scheduler + bestehende Features

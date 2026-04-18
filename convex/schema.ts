@@ -161,7 +161,9 @@ export default defineSchema({
     connections: v.array(v.string()), // IDs von dataLakeConnections oder "github:<repoId>"
     isActive: v.boolean(),
     lastRunAt: v.optional(v.number()),
-  }).index("by_user", ["userId"]),
+    nextRunAt: v.optional(v.number()), // Nächster geplanter Lauf (Timestamp)
+  }).index("by_user", ["userId"])
+    .index("by_next_run", ["nextRunAt"]),
 
   // KI-Agenten Logs
   agentLogs: defineTable({

@@ -37,3 +37,25 @@ export const listByUser = internalQuery({
       .collect();
   },
 });
+
+/** Interne Abfrage: Agenten, deren nextRunAt <= now und isActive = true */
+export const listDueForRun = internalQuery({
+  args: { now: v.number() },
+  handler: async (ctx, { now }) => {
+    // Alle Agenten mit nextRunAt laden (Index-Scan bis now)
+    const agents = await ctx.db
+      .query("aiAgents")
+      .withIndex("by_next_run", (q) => q.lte("nextRunAt", now))
+      .collect();
+
+    return agents.filter((a) => a.isActive && a.nextRunAt !== undefined);
+  },
+});
+
+/** Interne Abfrage: einzelnen Agenten ohne Auth-Check laden */
+export const getInternal = internalQuery({
+  args: { id: v.id("aiAgents") },
+  handler: async (ctx, { id }) => {
+    return ctx.db.get(id);
+  },
+});

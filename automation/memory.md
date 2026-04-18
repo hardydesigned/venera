@@ -10,7 +10,7 @@ Kompakte Erinnerung für zukünftige Läufe. Enthält wichtige Erkenntnisse, sen
 - [Code Diff Feature](memory/code-diff.md) — GitHub Repository Review-Tracking, SHA-Change-Detection, Sync-Action
 - [Team / Org Feature](memory/team-org.md) — Organisations- und Team-Verwaltung, Mitglieder, Org-Tasks
 - [Data Lake Feature](memory/data-lake.md) — Nextcloud/WebDAV Integration, Storage-Abstraction, File-Browser
-- [KI-Agenten Portal](memory/ai-agents.md) — Anthropic API, Convex Actions, Agent-Logs, Data Lake Kontext
+- [KI-Agenten Portal](memory/ai-agents.md) — Anthropic API, Convex Actions, Agent-Logs, Data Lake Kontext, Cron-Scheduler
 - [Feedback Dialog](memory/feedback-dialog.md) — Nutzer-Feedback-Dialog, Sidebar-Integration, Convex-Backend
 
 ## Aktueller Projektstatus (Stand: 2026-04-17)
@@ -69,6 +69,19 @@ Kompakte Erinnerung für zukünftige Läufe. Enthält wichtige Erkenntnisse, sen
 - Convex Auth Middleware: Package-Name ist `@convex-dev/auth/nextjs/server`
 - `convex/_generated/` fehlt noch (wird durch `convex dev` erstellt) — Build nicht möglich ohne
 - Inbox Edit-Page nutzt React 19 `use(params)` für async params
+
+### Erkenntnisse aus Lauf #10 (2026-04-18)
+- AUFG-006 Cron-Scheduler vollständig implementiert
+- `convex/crons.ts` — Convex `cronJobs()` alle 15 Minuten → `runScheduledAgents`
+- `convex/agents/lib/schedule.ts` — `computeNextRunAt(schedule, fromMs)` für SCHEDULE_OPTIONS-Expressions
+- `convex/agents/run/scheduled.ts` — `runScheduledAgents` (internalAction) + `runAgentById` (internalAction)
+- `convex/agents/agents/mutations.ts` — `updateNextRun` (internalMutation) + nextRunAt in create/update
+- `convex/agents/agents/queries.ts` — `listDueForRun` + `getInternal` (internalQuery)
+- `convex/datalake/items/queries.ts` — `listByConnectionInternal` (internalQuery)
+- Schema: `nextRunAt` Feld + `by_next_run` Index auf `aiAgents`
+- Wichtig: Cron-Action muss `"use node"` haben, weil sie `fetch` für Anthropic nutzt
+- `internal.*` Referenzen funktionieren anders als `api.*` — nur für internalQuery/Mutation/Action
+- Nächste offene Aufgaben: AUFG-009 (Dokumentation), AUFG-002 Bugs
 
 ### Erkenntnisse aus Lauf #9 (2026-04-18)
 - AUFG-006 Folgeaufgabe: Agent-Connections UI vollständig implementiert

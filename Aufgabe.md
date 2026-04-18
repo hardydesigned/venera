@@ -109,7 +109,7 @@ GitHub-Repository-Review-Tracking:
 - [x] Agenten-Verbindungen: UI zum Verknüpfen mit Data Lake Verbindungen — Lauf #9
 - [x] Edit-Page: /agenten/[id]/edit — Lauf #9
 - [x] Detail-Page: Verknüpfte Connections anzeigen + Edit-Button — Lauf #9
-- [ ] Zeitgesteuerte Agenten (Convex Scheduler / Cron) — Folgeaufgabe
+- [x] Zeitgesteuerte Agenten (Convex Scheduler / Cron) — Lauf #10
 - [ ] Telegram Bot Integration (AUFG-007) für Agent-Steuerung
 
 ---

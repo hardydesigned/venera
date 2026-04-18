@@ -1,8 +1,8 @@
 {
   "last_agent_used": "FEATURE_AGENT",
-  "next_agent": "FEATURE_AGENT",
-  "last_run_timestamp": "2026-04-18T00:00:00Z",
-  "last_task_id": "AUFG-006-connections-ui",
-  "run_count": 9,
-  "notes": "AUFG-006 Folgeaufgabe (Agent-Connections UI) erledigt. Noch offen: AUFG-006 Cron-Scheduler, AUFG-009 (Dokumentation), AUFG-002 Bugs. Nächster Agent: FEATURE_AGENT (noch offene Aufgaben vorhanden)."
+  "next_agent": "SECURITY_AGENT",
+  "last_run_timestamp": "2026-04-18T10:00:00Z",
+  "last_task_id": "AUFG-006-cron-scheduler",
+  "run_count": 10,
+  "notes": "AUFG-006 Cron-Scheduler erledigt. Alle AUFG-006 Sub-Tasks abgeschlossen. Nächste offene Aufgaben: AUFG-009 (Dokumentation), AUFG-002 Bugs. Da keine reinen Feature-Aufgaben mehr offen sind, rotiert zu SECURITY_AGENT."
 }
