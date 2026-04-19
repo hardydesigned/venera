@@ -4,7 +4,7 @@ import { requireAuth } from "../../lib/auth";
 
 export const list = query({
   handler: async (ctx) => {
-    const { userId } = await requireAuth(await ctx.auth.getUserIdentity());
+    const { userId } = await requireAuth(ctx);
 
     return ctx.db
       .query("aiAgents")
@@ -17,7 +17,7 @@ export const list = query({
 export const get = query({
   args: { id: v.id("aiAgents") },
   handler: async (ctx, { id }) => {
-    const { userId } = await requireAuth(await ctx.auth.getUserIdentity());
+    const { userId } = await requireAuth(ctx);
 
     const agent = await ctx.db.get(id);
     if (!agent || agent.userId !== userId) return null;

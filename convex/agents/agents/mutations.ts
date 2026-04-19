@@ -1,34 +1,41 @@
 import { mutation, internalMutation } from "../../_generated/server";
 import { requireAuth } from "../../lib/auth";
-import { createAgentSchema } from "../_model/agent";
-import { zCustomMutation, zid } from "convex-helpers/server/zod4";
-import { NoOp } from "convex-helpers/server/customFunctions";
-import { z } from "zod";
 import { v } from "convex/values";
 import { computeNextRunAt } from "../lib/schedule";
 
-const zMutation = zCustomMutation(mutation, NoOp);
-
-export const create = zMutation({
-  args: createAgentSchema,
+export const create = mutation({
+  args: {
+    name: v.string(),
+    description: v.optional(v.string()),
+    prompt: v.string(),
+    schedule: v.optional(v.string()),
+    connections: v.array(v.string()),
+    isActive: v.boolean(),
+  },
   handler: async (ctx, args) => {
-    const { userId } = await requireAuth(await ctx.auth.getUserIdentity());
+    const { userId } = await requireAuth(ctx);
     const nextRunAt = computeNextRunAt(args.schedule) ?? undefined;
 
     return ctx.db.insert("aiAgents", {
       ...args,
       userId,
-      nextRunAt,
+      ...(nextRunAt !== undefined ? { nextRunAt } : {}),
     });
   },
 });
 
-export const update = zMutation({
-  args: createAgentSchema.partial().extend({
-    id: zid("aiAgents"),
-  }),
+export const update = mutation({
+  args: {
+    id: v.id("aiAgents"),
+    name: v.optional(v.string()),
+    description: v.optional(v.string()),
+    prompt: v.optional(v.string()),
+    schedule: v.optional(v.string()),
+    connections: v.optional(v.array(v.string())),
+    isActive: v.optional(v.boolean()),
+  },
   handler: async (ctx, { id, ...updates }) => {
-    const { userId } = await requireAuth(await ctx.auth.getUserIdentity());
+    const { userId } = await requireAuth(ctx);
 
     const agent = await ctx.db.get(id);
     if (!agent || agent.userId !== userId) {
@@ -47,10 +54,10 @@ export const update = zMutation({
   },
 });
 
-export const remove = zMutation({
-  args: z.object({ id: zid("aiAgents") }),
+export const remove = mutation({
+  args: { id: v.id("aiAgents") },
   handler: async (ctx, { id }) => {
-    const { userId } = await requireAuth(await ctx.auth.getUserIdentity());
+    const { userId } = await requireAuth(ctx);
 
     const agent = await ctx.db.get(id);
     if (!agent || agent.userId !== userId) {
@@ -69,14 +76,13 @@ export const remove = zMutation({
   },
 });
 
-export const setLastRun = zMutation({
-  args: z.object({ id: zid("aiAgents") }),
+export const setLastRun = mutation({
+  args: { id: v.id("aiAgents") },
   handler: async (ctx, { id }) => {
     await ctx.db.patch(id, { lastRunAt: Date.now() });
   },
 });
 
-/** Intern: nextRunAt nach einem Scheduled-Run aktualisieren */
 export const updateNextRun = internalMutation({
   args: { id: v.id("aiAgents"), now: v.number() },
   handler: async (ctx, { id, now }) => {

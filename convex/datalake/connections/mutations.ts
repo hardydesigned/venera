@@ -1,24 +1,30 @@
 import { mutation } from "../../_generated/server";
-import { zCustomMutation, zid } from "convex-helpers/server/zod4";
-import { NoOp } from "convex-helpers/server/customFunctions";
-import { z } from "zod";
 import { requireAuth } from "../../lib/auth";
-import { createConnectionSchema } from "../_model/connection";
+import { v } from "convex/values";
 
-const zMutation = zCustomMutation(mutation, NoOp);
-
-export const create = zMutation({
-  args: createConnectionSchema,
+export const create = mutation({
+  args: {
+    name: v.string(),
+    provider: v.union(v.literal("nextcloud"), v.literal("onedrive"), v.literal("googledrive")),
+    webdavUrl: v.optional(v.string()),
+    username: v.optional(v.string()),
+    password: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
     const { userId } = await requireAuth(ctx);
     return ctx.db.insert("dataLakeConnections", { ...args, userId });
   },
 });
 
-export const update = zMutation({
-  args: createConnectionSchema.partial().extend({
-    id: zid("dataLakeConnections"),
-  }),
+export const update = mutation({
+  args: {
+    id: v.id("dataLakeConnections"),
+    name: v.optional(v.string()),
+    provider: v.optional(v.union(v.literal("nextcloud"), v.literal("onedrive"), v.literal("googledrive"))),
+    webdavUrl: v.optional(v.string()),
+    username: v.optional(v.string()),
+    password: v.optional(v.string()),
+  },
   handler: async (ctx, { id, ...updates }) => {
     const { userId } = await requireAuth(ctx);
     const connection = await ctx.db.get(id);
@@ -30,15 +36,14 @@ export const update = zMutation({
   },
 });
 
-export const remove = zMutation({
-  args: z.object({ id: zid("dataLakeConnections") }),
+export const remove = mutation({
+  args: { id: v.id("dataLakeConnections") },
   handler: async (ctx, { id }) => {
     const { userId } = await requireAuth(ctx);
     const connection = await ctx.db.get(id);
     if (!connection || connection.userId !== userId) {
       throw new Error("Verbindung nicht gefunden");
     }
-    // Cascade: Alle gecachten Items löschen
     const items = await ctx.db
       .query("dataLakeItems")
       .withIndex("by_connection", (q) => q.eq("connectionId", id))
@@ -50,8 +55,8 @@ export const remove = zMutation({
   },
 });
 
-export const setLastSync = zMutation({
-  args: z.object({ id: zid("dataLakeConnections") }),
+export const setLastSync = mutation({
+  args: { id: v.id("dataLakeConnections") },
   handler: async (ctx, { id }) => {
     const { userId } = await requireAuth(ctx);
     const connection = await ctx.db.get(id);

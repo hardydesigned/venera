@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
-import type { Task, TaskCategory, TaskStatus } from "@/convex/tasks/_model/task";
+import type { Task, TaskPriority, TaskStatus } from "@/convex/tasks/_model/task";
 import type { Id } from "@/convex/_generated/dataModel";
 
 interface EditTaskDialogProps {
@@ -31,9 +31,8 @@ interface EditTaskDialogProps {
     data: Partial<{
       title: string;
       description: string;
-      category: TaskCategory;
+      priority: TaskPriority;
       status: TaskStatus;
-      estimatedDurationMinutes: number | null;
     }>
   ) => Promise<void>;
   isLoading: boolean;
@@ -48,21 +47,15 @@ export function EditTaskDialog({
 }: EditTaskDialogProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState<TaskCategory>("B");
-  const [status, setStatus] = useState<TaskStatus>("OPEN");
-  const [estimatedMinutes, setEstimatedMinutes] = useState("");
+  const [priority, setPriority] = useState<TaskPriority>("C");
+  const [status, setStatus] = useState<TaskStatus>("open");
 
   useEffect(() => {
     if (task) {
       setTitle(task.title);
       setDescription(task.description ?? "");
-      setCategory(task.category);
+      setPriority(task.priority);
       setStatus(task.status);
-      setEstimatedMinutes(
-        task.estimatedDurationMinutes != null
-          ? String(task.estimatedDurationMinutes)
-          : ""
-      );
     }
   }, [task]);
 
@@ -70,15 +63,7 @@ export function EditTaskDialog({
     e.preventDefault();
     if (!task) return;
 
-    await onSubmit(task._id, {
-      title,
-      description,
-      category,
-      status,
-      estimatedDurationMinutes: estimatedMinutes
-        ? parseInt(estimatedMinutes, 10)
-        : null,
-    });
+    await onSubmit(task._id, { title, description, priority, status });
     onOpenChange(false);
   };
 
@@ -113,14 +98,14 @@ export function EditTaskDialog({
             <div className="space-y-2">
               <Label>Priorität</Label>
               <Select
-                value={category}
-                onValueChange={(v) => setCategory(v as TaskCategory)}
+                value={priority}
+                onValueChange={(v) => setPriority(v as TaskPriority)}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="A">A – Dringend & Wichtig</SelectItem>
+                  <SelectItem value="A">A – Dringend &amp; Wichtig</SelectItem>
                   <SelectItem value="B">B – Wichtig</SelectItem>
                   <SelectItem value="C">C – Später</SelectItem>
                 </SelectContent>
@@ -136,24 +121,13 @@ export function EditTaskDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="OPEN">Offen</SelectItem>
-                  <SelectItem value="IN_PROGRESS">In Bearbeitung</SelectItem>
-                  <SelectItem value="DONE">Erledigt</SelectItem>
-                  <SelectItem value="CANCELLED">Abgebrochen</SelectItem>
+                  <SelectItem value="open">Offen</SelectItem>
+                  <SelectItem value="in_progress">In Bearbeitung</SelectItem>
+                  <SelectItem value="done">Erledigt</SelectItem>
+                  <SelectItem value="cancelled">Abgebrochen</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="edit-duration">Geschätzte Dauer (Min.)</Label>
-            <Input
-              id="edit-duration"
-              type="number"
-              value={estimatedMinutes}
-              onChange={(e) => setEstimatedMinutes(e.target.value)}
-              placeholder="z.B. 30"
-              min={1}
-            />
           </div>
           <DialogFooter>
             <Button

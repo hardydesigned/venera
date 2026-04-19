@@ -1,7 +1,8 @@
-"use node";
-
 import { httpAction } from "../../_generated/server";
 import { internal, api } from "../../_generated/api";
+import type { Doc } from "../../_generated/dataModel";
+
+type AiAgentDoc = Doc<"aiAgents">;
 
 interface TelegramMessage {
   message_id: number;
@@ -52,10 +53,10 @@ export const handleWebhook = httpAction(async (ctx, request) => {
     const { botToken, userId } = settings;
 
     // Agenten des Nutzers laden (intern, ohne Auth)
-    const agents = await ctx.runQuery(
+    const agents = (await ctx.runQuery(
       internal.agents.agents.queries.listByUser,
       { userId },
-    );
+    )) as AiAgentDoc[];
 
     let responseText = "";
 

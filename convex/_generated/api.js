@@ -1,21 +1,23 @@
 /* eslint-disable */
 /**
- * Stub file – wird durch `npx convex dev` überschrieben.
- * Nur für Build-Kompilierung ohne laufenden Convex-Dev-Server.
+ * Generated `api` utility.
+ *
+ * THIS CODE IS AUTOMATICALLY GENERATED.
+ *
+ * To regenerate, run `npx convex dev`.
+ * @module
  */
-import { makeFunctionReference } from "convex/server";
 
-export const api = {
-  tasks: {
-    queries: {
-      list: makeFunctionReference("tasks/queries:list"),
-      listInbox: makeFunctionReference("tasks/queries:listInbox"),
-      get: makeFunctionReference("tasks/queries:get"),
-    },
-    mutations: {
-      create: makeFunctionReference("tasks/mutations:create"),
-      update: makeFunctionReference("tasks/mutations:update"),
-      remove: makeFunctionReference("tasks/mutations:remove"),
-    },
-  },
-};
+import { anyApi, componentsGeneric } from "convex/server";
+
+/**
+ * A utility for referencing Convex functions in your app's API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = api.myModule.myFunction;
+ * ```
+ */
+export const api = anyApi;
+export const internal = anyApi;
+export const components = componentsGeneric();

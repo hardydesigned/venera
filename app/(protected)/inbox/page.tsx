@@ -12,7 +12,7 @@ import { CreateTaskDialog } from "./_components/CreateTaskDialog";
 import { EditTaskDialog } from "./_components/EditTaskDialog";
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import type { Id } from "@/convex/_generated/dataModel";
-import type { Task, CreateTask, TaskCategory, TaskStatus } from "@/convex/tasks/_model/task";
+import type { Task, CreateTask, TaskPriority, TaskStatus } from "@/convex/tasks/_model/task";
 
 export default function InboxPage() {
   const { create, update, remove } = useTasks();
@@ -46,7 +46,7 @@ export default function InboxPage() {
     const task = tasks.find((t) => t._id === id);
     if (!task) return;
 
-    const newStatus = task.status === "DONE" ? "OPEN" : "DONE";
+    const newStatus = task.status === "done" ? "open" : "done";
     const { error } = await update(id, { status: newStatus });
 
     if (error) {
@@ -64,9 +64,8 @@ export default function InboxPage() {
     data: Partial<{
       title: string;
       description: string;
-      category: TaskCategory;
+      priority: TaskPriority;
       status: TaskStatus;
-      estimatedDurationMinutes: number | null;
     }>,
   ) => {
     setIsEditSubmitting(true);

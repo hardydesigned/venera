@@ -1,14 +1,12 @@
 import { mutation } from "../../_generated/server";
 import { requireAuth } from "../../lib/auth";
-import { telegramSettingsSchema } from "../_model/telegram";
-import { zCustomMutation } from "convex-helpers/server/zod4";
-import { NoOp } from "convex-helpers/server/customFunctions";
 import { v } from "convex/values";
 
-const zMutation = zCustomMutation(mutation, NoOp);
-
-export const upsertSettings = zMutation({
-  args: telegramSettingsSchema,
+export const upsertSettings = mutation({
+  args: {
+    botToken: v.string(),
+    authorizedChatId: v.string(),
+  },
   handler: async (ctx, args) => {
     const { userId } = await requireAuth(ctx);
 

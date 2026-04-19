@@ -109,6 +109,16 @@ export function useOrgTasks(orgId: Id<"organizations"> | undefined) {
   };
 }
 
+/** Inbox-Aufgaben: persönliche Aufgaben ohne Datum */
+export function useInboxTasks() {
+  const tasks = useQuery(api.tasks.tasks.queries.listPersonal);
+
+  return {
+    tasks: (tasks ?? []).filter((t) => !t.dueDate),
+    isLoading: tasks === undefined,
+  };
+}
+
 /** Einzelne Aufgabe laden */
 export function useTask(id: Id<"tasks"> | undefined) {
   const task = useQuery(

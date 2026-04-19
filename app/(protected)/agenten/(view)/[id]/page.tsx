@@ -13,6 +13,7 @@ import { useDataLakeConnections } from "@/app/(protected)/datalake/_controller/u
 import type { Id } from "@/convex/_generated/dataModel";
 import type { AgentLog } from "@/convex/agents/_model/agent";
 import { PROVIDER_LABELS } from "@/convex/datalake/_model/connection";
+import type { DataLakeConnection } from "@/convex/datalake/_model/connection";
 
 function LogStatusIcon({ status }: { status: AgentLog["status"] }) {
   if (status === "running") return <Clock className="h-4 w-4 text-blue-500 animate-pulse" />;
@@ -61,7 +62,7 @@ export default function AgentDetailPage({ params }: PageProps) {
     );
   }
 
-  const linkedConnections = allConnections.filter((c) =>
+  const linkedConnections: DataLakeConnection[] = allConnections.filter((c: DataLakeConnection) =>
     (agent.connections ?? []).includes(`datalake:${c._id}`),
   );
 
@@ -167,7 +168,7 @@ export default function AgentDetailPage({ params }: PageProps) {
           ) : (
             <ScrollArea className="h-64">
               <div className="space-y-3">
-                {logs.map((log) => (
+                {logs.map((log: AgentLog) => (
                   <div key={log._id} className="border rounded-lg p-3 space-y-1">
                     <div className="flex items-center gap-2">
                       <LogStatusIcon status={log.status} />

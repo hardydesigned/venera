@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeft, Pencil, Trash2, Clock, Loader2 } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,33 +12,33 @@ import { EditTaskDialog } from "../_components/EditTaskDialog";
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { useTask, useTasks } from "../_controller/useTasks";
 import type { Id } from "@/convex/_generated/dataModel";
-import type { TaskCategory, TaskStatus } from "@/convex/tasks/_model/task";
+import type { TaskPriority, TaskStatus } from "@/convex/tasks/_model/task";
 import Link from "next/link";
 
-const categoryLabels: Record<string, string> = {
+const priorityLabels: Record<string, string> = {
   A: "A – Dringend & Wichtig",
   B: "B – Wichtig",
   C: "C – Später",
 };
 
-const categoryVariants: Record<string, "destructive" | "secondary" | "outline"> = {
+const priorityVariants: Record<string, "destructive" | "secondary" | "outline"> = {
   A: "destructive",
   B: "secondary",
   C: "outline",
 };
 
 const statusLabels: Record<string, string> = {
-  OPEN: "Offen",
-  IN_PROGRESS: "In Bearbeitung",
-  DONE: "Erledigt",
-  CANCELLED: "Abgebrochen",
+  open: "Offen",
+  in_progress: "In Bearbeitung",
+  done: "Erledigt",
+  cancelled: "Abgebrochen",
 };
 
 const statusVariants: Record<string, "default" | "secondary" | "outline"> = {
-  OPEN: "outline",
-  IN_PROGRESS: "secondary",
-  DONE: "default",
-  CANCELLED: "outline",
+  open: "outline",
+  in_progress: "secondary",
+  done: "default",
+  cancelled: "outline",
 };
 
 export default function TaskDetailPage() {
@@ -58,9 +58,8 @@ export default function TaskDetailPage() {
     data: Partial<{
       title: string;
       description: string;
-      category: TaskCategory;
+      priority: TaskPriority;
       status: TaskStatus;
-      estimatedDurationMinutes: number | null;
     }>,
   ) => {
     setIsEditSubmitting(true);
@@ -147,8 +146,8 @@ export default function TaskDetailPage() {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Badge variant={categoryVariants[task.category]}>
-          {categoryLabels[task.category]}
+        <Badge variant={priorityVariants[task.priority]}>
+          {priorityLabels[task.priority]}
         </Badge>
         <Badge variant={statusVariants[task.status]}>
           {statusLabels[task.status]}
@@ -171,34 +170,16 @@ export default function TaskDetailPage() {
           )}
 
           <div className="grid grid-cols-2 gap-4 text-sm">
-            {task.estimatedDurationMinutes != null && (
-              <div>
-                <p className="font-medium text-muted-foreground mb-1">Geschätzte Dauer</p>
-                <div className="flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span>{task.estimatedDurationMinutes} Min.</span>
-                </div>
-              </div>
-            )}
-            {task.actualDurationMinutes != null && (
-              <div>
-                <p className="font-medium text-muted-foreground mb-1">Tatsächliche Dauer</p>
-                <div className="flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span>{task.actualDurationMinutes} Min.</span>
-                </div>
-              </div>
-            )}
             {task.startDate && (
               <div>
                 <p className="font-medium text-muted-foreground mb-1">Startdatum</p>
-                <span>{task.startDate}</span>
+                <span>{new Date(task.startDate).toLocaleDateString("de-DE")}</span>
               </div>
             )}
             {task.dueDate && (
               <div>
                 <p className="font-medium text-muted-foreground mb-1">Fälligkeitsdatum</p>
-                <span>{task.dueDate}</span>
+                <span>{new Date(task.dueDate).toLocaleDateString("de-DE")}</span>
               </div>
             )}
           </div>

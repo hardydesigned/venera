@@ -3,7 +3,7 @@ import { requireAuth } from "../../lib/auth";
 
 export const listMine = query({
   handler: async (ctx) => {
-    const { userId } = await requireAuth(await ctx.auth.getUserIdentity());
+    const { userId } = await requireAuth(ctx);
 
     return ctx.db
       .query("userFeedback")

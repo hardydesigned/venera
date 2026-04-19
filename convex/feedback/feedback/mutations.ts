@@ -1,15 +1,15 @@
 import { mutation } from "../../_generated/server";
 import { requireAuth } from "../../lib/auth";
-import { createFeedbackSchema } from "../_model/feedback";
-import { zCustomMutation } from "convex-helpers/server/zod4";
-import { NoOp } from "convex-helpers/server/customFunctions";
+import { v } from "convex/values";
 
-const zMutation = zCustomMutation(mutation, NoOp);
-
-export const submit = zMutation({
-  args: createFeedbackSchema,
+export const submit = mutation({
+  args: {
+    type: v.union(v.literal("feature"), v.literal("bug"), v.literal("other")),
+    title: v.string(),
+    description: v.string(),
+  },
   handler: async (ctx, args) => {
-    const { userId } = await requireAuth(await ctx.auth.getUserIdentity());
+    const { userId } = await requireAuth(ctx);
 
     return ctx.db.insert("userFeedback", {
       ...args,

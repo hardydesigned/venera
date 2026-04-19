@@ -45,8 +45,9 @@ export default function RegisterPage() {
         name: formData.get("name") as string,
       });
       router.push("/");
-    } catch {
-      toast.error("Registrierung fehlgeschlagen. Bitte erneut versuchen.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : null;
+      toast.error(message ?? "Registrierung fehlgeschlagen. Bitte erneut versuchen.");
     } finally {
       setIsLoading(false);
     }

@@ -4,7 +4,7 @@ import { requireAuth } from "../lib/auth";
 
 export const list = query({
   handler: async (ctx) => {
-    const { userId } = await requireAuth(await ctx.auth.getUserIdentity());
+    const { userId } = await requireAuth(ctx);
 
     return ctx.db
       .query("tasks")
@@ -16,7 +16,7 @@ export const list = query({
 
 export const listInbox = query({
   handler: async (ctx) => {
-    const { userId } = await requireAuth(await ctx.auth.getUserIdentity());
+    const { userId } = await requireAuth(ctx);
 
     const tasks = await ctx.db
       .query("tasks")
@@ -25,10 +25,10 @@ export const listInbox = query({
 
     return tasks.filter(
       (t) =>
-        t.startDate === null &&
-        t.dueDate === null &&
-        t.status !== "DONE" &&
-        t.status !== "CANCELLED",
+        t.startDate === undefined &&
+        t.dueDate === undefined &&
+        t.status !== "done" &&
+        t.status !== "cancelled",
     );
   },
 });
@@ -36,7 +36,7 @@ export const listInbox = query({
 export const get = query({
   args: { id: v.id("tasks") },
   handler: async (ctx, { id }) => {
-    const { userId } = await requireAuth(await ctx.auth.getUserIdentity());
+    const { userId } = await requireAuth(ctx);
 
     const task = await ctx.db.get(id);
     if (!task || task.userId !== userId) {

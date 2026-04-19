@@ -5,7 +5,7 @@ import { requireAuth } from "../../lib/auth";
 export const listByAgent = query({
   args: { agentId: v.id("aiAgents") },
   handler: async (ctx, { agentId }) => {
-    const { userId } = await requireAuth(await ctx.auth.getUserIdentity());
+    const { userId } = await requireAuth(ctx);
 
     // Sicherstellen dass der Agent dem Nutzer gehört
     const agent = await ctx.db.get(agentId);

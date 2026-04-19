@@ -14,13 +14,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { EllipsisVertical, Check } from "lucide-react";
 
-const categoryColors: Record<string, string> = {
+const priorityColors: Record<string, string> = {
   A: "destructive",
   B: "secondary",
   C: "outline",
 };
 
-const categoryLabels: Record<string, string> = {
+const priorityLabels: Record<string, string> = {
   A: "A-Priorität",
   B: "B-Priorität",
   C: "C-Priorität",
@@ -47,7 +47,7 @@ export function TaskCard({ task, onComplete, onDelete, onEdit }: TaskCardProps) 
           onClick={() => onComplete(task._id)}
           data-testid="task-complete-btn"
         >
-          {task.status === "DONE" && <Check className="h-3 w-3" />}
+          {task.status === "done" && <Check className="h-3 w-3" />}
         </Button>
 
         <div className="flex-1 min-w-0">
@@ -58,7 +58,7 @@ export function TaskCard({ task, onComplete, onDelete, onEdit }: TaskCardProps) 
           >
             <p
               className={
-                task.status === "DONE"
+                task.status === "done"
                   ? "line-through text-muted-foreground"
                   : "font-medium"
               }
@@ -72,14 +72,9 @@ export function TaskCard({ task, onComplete, onDelete, onEdit }: TaskCardProps) 
             </p>
           )}
           <div className="mt-2 flex items-center gap-2">
-            <Badge variant={categoryColors[task.category] as "destructive" | "secondary" | "outline"}>
-              {categoryLabels[task.category]}
+            <Badge variant={priorityColors[task.priority] as "destructive" | "secondary" | "outline"}>
+              {priorityLabels[task.priority]}
             </Badge>
-            {task.estimatedDurationMinutes && (
-              <span className="text-xs text-muted-foreground">
-                ~{task.estimatedDurationMinutes} Min.
-              </span>
-            )}
           </div>
         </div>
 

@@ -35,8 +35,9 @@ export default function LoginPage() {
         flow: "signIn",
       });
       router.push("/");
-    } catch {
-      toast.error("Anmeldung fehlgeschlagen. Bitte E-Mail und Passwort prüfen.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : null;
+      toast.error(message ?? "Anmeldung fehlgeschlagen. Bitte E-Mail und Passwort prüfen.");
     } finally {
       setIsLoading(false);
     }

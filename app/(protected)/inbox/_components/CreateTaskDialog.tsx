@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
-import type { CreateTask, TaskCategory, TaskStatus } from "@/convex/tasks/_model/task";
+import type { CreateTask, TaskPriority } from "@/convex/tasks/_model/task";
 
 interface CreateTaskDialogProps {
   open: boolean;
@@ -36,27 +36,19 @@ export function CreateTaskDialog({
 }: CreateTaskDialogProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState<TaskCategory>("B");
-  const [estimatedMinutes, setEstimatedMinutes] = useState("");
+  const [priority, setPriority] = useState<TaskPriority>("C");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await onSubmit({
       title,
       description,
-      category,
-      status: "OPEN" as TaskStatus,
-      startDate: null,
-      dueDate: null,
-      estimatedDurationMinutes: estimatedMinutes
-        ? parseInt(estimatedMinutes, 10)
-        : null,
-      actualDurationMinutes: null,
+      priority,
+      status: "open",
     });
     setTitle("");
     setDescription("");
-    setCategory("B");
-    setEstimatedMinutes("");
+    setPriority("C");
     onOpenChange(false);
   };
 
@@ -87,34 +79,21 @@ export function CreateTaskDialog({
               placeholder="Optional..."
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Priorität</Label>
-              <Select
-                value={category}
-                onValueChange={(v) => setCategory(v as TaskCategory)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="A">A – Dringend & Wichtig</SelectItem>
-                  <SelectItem value="B">B – Wichtig</SelectItem>
-                  <SelectItem value="C">C – Später</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="duration">Dauer (Min.)</Label>
-              <Input
-                id="duration"
-                type="number"
-                value={estimatedMinutes}
-                onChange={(e) => setEstimatedMinutes(e.target.value)}
-                placeholder="z.B. 30"
-                min={1}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label>Priorität</Label>
+            <Select
+              value={priority}
+              onValueChange={(v) => setPriority(v as TaskPriority)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="A">A – Dringend &amp; Wichtig</SelectItem>
+                <SelectItem value="B">B – Wichtig</SelectItem>
+                <SelectItem value="C">C – Später</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <DialogFooter>
             <Button

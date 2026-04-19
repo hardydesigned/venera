@@ -1,31 +1,27 @@
 import { mutation } from "../../_generated/server";
-import { zCustomMutation, zid } from "convex-helpers/server/zod4";
-import { NoOp } from "convex-helpers/server/customFunctions";
-import { z } from "zod";
+import { v } from "convex/values";
 
-const zMutation = zCustomMutation(mutation, NoOp);
-
-export const createLog = zMutation({
-  args: z.object({
-    agentId: zid("aiAgents"),
-    status: z.enum(["running", "success", "error"]),
-    summary: z.string().optional(),
-    errorMessage: z.string().optional(),
-    startedAt: z.number(),
-    finishedAt: z.number().optional(),
-  }),
+export const createLog = mutation({
+  args: {
+    agentId: v.id("aiAgents"),
+    status: v.union(v.literal("running"), v.literal("success"), v.literal("error")),
+    summary: v.optional(v.string()),
+    errorMessage: v.optional(v.string()),
+    startedAt: v.number(),
+    finishedAt: v.optional(v.number()),
+  },
   handler: async (ctx, args) => {
     return ctx.db.insert("agentLogs", args);
   },
 });
 
-export const finishLog = zMutation({
-  args: z.object({
-    logId: zid("agentLogs"),
-    status: z.enum(["success", "error"]),
-    summary: z.string().optional(),
-    errorMessage: z.string().optional(),
-  }),
+export const finishLog = mutation({
+  args: {
+    logId: v.id("agentLogs"),
+    status: v.union(v.literal("success"), v.literal("error")),
+    summary: v.optional(v.string()),
+    errorMessage: v.optional(v.string()),
+  },
   handler: async (ctx, { logId, ...updates }) => {
     await ctx.db.patch(logId, {
       ...updates,
